@@ -58,7 +58,23 @@
   .upsell { background:var(--ink); color:#fff; border-radius:16px; padding:28px 24px; margin-top:40px; }
   .upsell h3 { margin:0 0 8px; font-size:20px; } .upsell p { color:#aaa; margin:0 0 18px; font-size:14px; line-height:1.6; }
   .actions { display:flex; gap:10px; margin-top:28px; } .actions .btn { flex:1; }
-  @media print { .nav, .actions, .upsell, .copy { display:none !important; } .wrap { padding:0; } }
+  .verdict { color:#eee; }
+  mark { background:#fff3b0; color:inherit; padding:0 2px; border-radius:3px; }
+  .audited { font-size:14px; color:#555; margin:-4px 0 18px; line-height:1.5; }
+  .phnote { font-size:13px; color:#555; margin:16px 0 0; }
+  .disclaimer { font-size:12px; color:#888; line-height:1.6; margin-top:36px; border-top:1px solid #eee; padding-top:16px; }
+  .print-brand { display:none; }
+  @media print {
+    @page { margin: 16mm; }
+    .nav, .actions, .upsell, .copy, #netlify-badge, [class*="netlify-badge"] { display:none !important; }
+    .wrap { padding:0; max-width:none; }
+    .print-brand { display:block; font-weight:700; font-size:18px; letter-spacing:-0.02em; margin-bottom:10px; }
+    .print-brand span { color:#9bbf1a; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .issue, .copybox, .score-head { break-inside: avoid; }
+    h2 { break-after: avoid; }
+    .copybox { padding-right:18px; }
+  }
 </style>
 </head>
 <body>
@@ -122,9 +138,12 @@
   let saved = null;
   try { saved = sessionId ? JSON.parse(localStorage.getItem(STORE_KEY) || 'null') : null; } catch (e) {}
 
-  if (!sessionId) $('nopay').classList.remove('hidden');
-  else if (saved) render(saved);
-  else $('formSec').classList.remove('hidden');
+  function newReport() {
+    try { localStorage.removeItem(STORE_KEY); } catch (e) {}
+    $('out').classList.add('hidden');
+    $('formSec').classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -147,7 +166,7 @@
         return body.result;
       };
       const [audit, copy, extras] = await Promise.all([getPart('audit'), getPart('copy'), getPart('extras')]);
-      const report = { ...audit, ...copy, ...extras };
+      const report = { ...audit, ...copy, ...extras, _meta: { title: data.title, asin: data.asin, date: new Date().toISOString() } };
       try { localStorage.setItem(STORE_KEY, JSON.stringify(report)); } catch (e) {}
       render(report);
     } catch (err) {
@@ -158,8 +177,11 @@
     }
   });
 
+  // Highlight [placeholders] so the seller sees what to fill in
+  const ph = (s) => esc(s).replace(/\[([^\]]+)\]/g, '<mark>[$1]</mark>');
+
   function copyBox(text) {
-    return `<div class="copybox">${esc(text)}<button class="copy" data-copy="${esc(text)}">Copy</button></div>`;
+    return `<div class="copybox">${ph(text)}<button class="copy" data-copy="${esc(text)}">Copy</button></div>`;
   }
 
   function render(r) {
@@ -170,13 +192,19 @@
       <div class="issue">
         <span class="tag ${esc(i.severity)}">${esc(i.severity)}</span><span class="tag area">${esc(i.area)}</span>
         <p><b>Problem:</b> ${esc(i.problem)}</p>
-        <p class="fix"><b>Fix:</b> ${esc(i.fix)}</p>
+        <p class="fix"><b>Fix:</b> ${ph(i.fix)}</p>
       </div>`).join('');
     const list = (a) => `<ul class="list">${(a||[]).map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
     const comp = (r.competitor_insights || []).length ? `<h2>Competitor check</h2>${list(r.competitor_insights)}` : '';
 
+    const m = r._meta || {};
+    const dateStr = m.date ? new Date(m.date).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) : '';
+    const hasPh = JSON.stringify(r).includes('[');
+
     $('out').innerHTML = `
-      <p class="eyebrow">Your full listing report</p>
+      <div class="print-brand">LISTONIX<span>.</span></div>
+      <p class="eyebrow">Full listing report${dateStr ? ' · ' + esc(dateStr) : ''}${m.asin ? ' · ASIN ' + esc(m.asin) : ''}</p>
+      ${m.title ? `<p class="audited">Audited listing: <b>${esc(m.title)}</b></p>` : ''}
       <div class="score-head">
         <div class="score-num">${esc(r.score)}<small>/100</small></div>
         <p class="verdict">${esc(r.verdict)}</p>
@@ -185,6 +213,8 @@
 
       <h2>Do these 3 things today</h2>
       ${list(r.quick_wins)}
+
+      ${hasPh ? `<p class="phnote"><mark>[Highlighted brackets]</mark> mark details we couldn't confirm from your text. Fill them in before publishing.</p>` : ''}
 
       <h2>Your new title</h2>
       ${copyBox(r.new_title)}
@@ -205,8 +235,11 @@
 
       ${comp}
 
+      <p class="disclaimer">This report is based only on the listing text you provided. Recommendations are AI-assisted and should be checked against your product's actual specifications and Amazon's current category style guide before publishing. Listonix does not guarantee rankings or sales results.</p>
+
       <div class="actions">
         <button class="btn ghost" onclick="window.print()">Save as PDF</button>
+        <button class="btn ghost" onclick="newReport()">Start a new report</button>
       </div>
 
       <div class="upsell">
@@ -223,6 +256,11 @@
     if (!b) return;
     navigator.clipboard.writeText(b.dataset.copy).then(() => { b.textContent = 'Copied'; setTimeout(() => b.textContent = 'Copy', 1500); });
   });
+
+  // Initial view (runs last, after all helpers are defined)
+  if (!sessionId) $('nopay').classList.remove('hidden');
+  else if (saved && !params.has('fresh')) render(saved);
+  else $('formSec').classList.remove('hidden');
 </script>
 </body>
 </html>
