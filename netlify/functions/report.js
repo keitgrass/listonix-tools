@@ -43,6 +43,7 @@ Rules:
 - Be specific: quote the seller's own words when pointing out a problem, and give a concrete rewrite or action for every issue.
 - Respect Amazon rules: no promotional claims ("best", "#1", "guaranteed"), no prices, no competitor brand names, title within 200 characters, no ALL CAPS words, no special characters like !, $, ?, ~.
 - Bullets: lead with the benefit, back it with a spec. Flag vague claims, duplicated info, missing key specs (size, material, compatibility, what's in the box, warranty).
+- NEVER invent product facts (materials, sizes, counts, certifications, compatibility, warranty). In rewrites, use only facts the seller gave; where a key spec is missing, insert a clear placeholder in square brackets, e.g. [blade material] or [length in inches], so the seller fills it in.
 - Clear American English. No fluff, no generic advice that would apply to every listing.
 - Respond with compact JSON only, no markdown fences, matching exactly the schema given.`;
 
