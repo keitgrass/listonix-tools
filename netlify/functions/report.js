@@ -44,6 +44,9 @@ Rules:
 - Respect Amazon rules: no promotional claims ("best", "#1", "guaranteed"), no prices, no competitor brand names, title within 200 characters, no ALL CAPS words, no special characters like !, $, ?, ~.
 - Bullets: lead with the benefit, back it with a spec. Flag vague claims, duplicated info, missing key specs (size, material, compatibility, what's in the box, warranty).
 - NEVER invent product facts (materials, sizes, counts, certifications, compatibility, warranty). In rewrites, use only facts the seller gave; where a key spec is missing, insert a clear placeholder in square brackets, e.g. [blade material] or [length in inches], so the seller fills it in.
+- If the seller's own text CONTRADICTS itself on a spec (e.g. "all-steel" in one place and "aluminum" in another, or a capacity that could be per unit or per pair), do NOT pick a side anywhere, including titles. Use a placeholder such as [confirm material: steel or aluminum].
+- Placeholders are ALWAYS in square brackets. Never use parentheses for notes to the seller inside copy meant to be pasted.
+- Do not call the product something it is not (e.g. don't call a cabinet lifter a "floor jack" unless the seller does).
 - Clear American English. No fluff, no generic advice that would apply to every listing.
 - Respond with compact JSON only, no markdown fences, matching exactly the schema given.`;
 
@@ -69,7 +72,7 @@ const PARTS = {
   extras: {
     max_tokens: 1000,
     schema: `{
-  "missing_keywords": [ "keyword phrases buyers likely search that are missing" ],   // 8-12 items
+  "missing_keywords": [ "keyword phrases buyers likely search that do NOT already appear in the seller's title, bullets or description" ],   // 8-12 items; never list a phrase the seller already uses
   "image_checklist": [ "specific image to include for THIS product" ],   // 6 items, each under 20 words
   "competitor_insights": [ "what competitors do better or worse, based on the competitor titles provided" ]   // 2-4 items, or [] if none provided
 }`,
@@ -144,6 +147,10 @@ ${cfg.schema}`;
       return json(502, { error: 'The report could not be generated. Please try again.' });
     }
     const result = JSON.parse(text.slice(start, end + 1));
+    if (Array.isArray(result.missing_keywords)) {
+      const existing = `${title} ${bullets} ${description || ''}`.toLowerCase();
+      result.missing_keywords = result.missing_keywords.filter((k) => !existing.includes(String(k).toLowerCase().trim()));
+    }
     return json(200, { part, result, email: pay.email });
   } catch (err) {
     console.error(err);
