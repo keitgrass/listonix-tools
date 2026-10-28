@@ -100,7 +100,7 @@
 
   <section id="loading" class="hidden loading">
     <div class="spinner"></div>
-    <p>Analyzing your listing… this takes about 30–60 seconds.</p>
+    <p>Analyzing your listing… this takes about 15–20 seconds.</p>
   </section>
 
   <!-- Report -->
@@ -136,11 +136,20 @@
     $('formSec').classList.add('hidden');
     $('loading').classList.remove('hidden');
     try {
-      const res = await fetch('/.netlify/functions/report', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(data) });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.error || 'Something went wrong.');
-      try { localStorage.setItem(STORE_KEY, JSON.stringify(body.report)); } catch (e) {}
-      render(body.report);
+      const getPart = async (part, attempt = 1) => {
+        const res = await fetch('/.netlify/functions/report', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ ...data, part }) });
+        let body = {};
+        try { body = await res.json(); } catch (e) {}
+        if (!res.ok) {
+          if (attempt < 2 && res.status !== 402 && res.status !== 400) return getPart(part, attempt + 1);
+          throw new Error(body.error || 'The report took too long. Please try again.');
+        }
+        return body.result;
+      };
+      const [audit, copy, extras] = await Promise.all([getPart('audit'), getPart('copy'), getPart('extras')]);
+      const report = { ...audit, ...copy, ...extras };
+      try { localStorage.setItem(STORE_KEY, JSON.stringify(report)); } catch (e) {}
+      render(report);
     } catch (err) {
       $('loading').classList.add('hidden');
       $('formSec').classList.remove('hidden');

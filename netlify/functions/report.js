@@ -1,11 +1,14 @@
 // Listonix — paid Full Listing Report
-// Env vars (Netlify → Site configuration → Environment variables):
+// The report is built in 3 parts that the page requests in parallel,
+// so each call stays well inside Netlify's function time limit.
+//
+// Env vars (Netlify → Project configuration → Environment variables):
 //   ANTHROPIC_API_KEY   – Anthropic API key
-//   STRIPE_SECRET_KEY   – Stripe secret or restricted key (needs read access to Checkout Sessions)
-//   TEST_CODE           – optional: a private code that bypasses payment, for your own testing
-//   REPORT_MIN_CENTS    – optional: minimum paid amount in cents (default 1999)
+//   STRIPE_SECRET_KEY   – Stripe secret or restricted key (read access to Checkout Sessions)
+//   TEST_CODE           – optional private code that bypasses payment, for your own testing
+//   REPORT_MIN_CENTS    – optional minimum paid amount in cents (default 1999)
 
-const MODEL = 'claude-sonnet-5-5';
+const MODEL = 'claude-haiku-5-5';
 
 const json = (statusCode, body) => ({
   statusCode,
@@ -20,6 +23,7 @@ async function verifyPayment(sessionId) {
   if (!sessionId || !/^cs_(test|live)_[A-Za-z0-9]+$/.test(sessionId)) {
     return { ok: false, reason: 'Missing or invalid payment reference.' };
   }
+  if (!process.env.STRIPE_SECRET_KEY) return { ok: false, reason: 'Payments are not configured yet.' };
   const res = await fetch(
     `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
     { headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` } }
@@ -35,26 +39,41 @@ async function verifyPayment(sessionId) {
 const SYSTEM = `You are a senior Amazon listing strategist with 6+ years of hands-on FBA selling experience (strongest in Tools & Home Improvement, but you work across categories). You write paid listing audits for Amazon sellers.
 
 Rules:
-- Analyze ONLY the text the seller provided. Never claim to have seen the live listing, its images, reviews, sales or rankings. If something can't be judged from the text, say what to check instead.
+- Analyze ONLY the text the seller provided. Never claim to have seen the live listing, its images, reviews, sales or rankings.
 - Be specific: quote the seller's own words when pointing out a problem, and give a concrete rewrite or action for every issue.
-- Respect Amazon rules: no promotional claims ("best", "#1", "guaranteed"), no prices, no competitor brand names in titles, title within the category's character limit (assume 200 characters unless the category clearly uses less), no ALL CAPS words, no special characters like !, $, ?, ~.
+- Respect Amazon rules: no promotional claims ("best", "#1", "guaranteed"), no prices, no competitor brand names, title within 200 characters, no ALL CAPS words, no special characters like !, $, ?, ~.
 - Bullets: lead with the benefit, back it with a spec. Flag vague claims, duplicated info, missing key specs (size, material, compatibility, what's in the box, warranty).
-- Write in clear American English. No fluff, no generic advice that would apply to every listing.
-- Respond with JSON only, no markdown fences, matching exactly the schema you are given.`;
+- Clear American English. No fluff, no generic advice that would apply to every listing.
+- Respond with compact JSON only, no markdown fences, matching exactly the schema given.`;
 
-const SCHEMA = `{
+const PARTS = {
+  audit: {
+    max_tokens: 1400,
+    schema: `{
   "score": integer 0-100,
-  "verdict": "one sentence summary of the listing's biggest weakness",
+  "verdict": "one sentence: the listing's biggest weakness",
   "scores": { "title": 0-100, "bullets": 0-100, "description": 0-100, "keywords": 0-100 },
-  "issues": [ { "severity": "high" | "medium" | "low", "area": "title" | "bullets" | "description" | "keywords" | "compliance" | "images", "problem": "what is wrong, quoting their text", "fix": "exact change to make" } ],   // 6-12 items, sorted by severity
+  "issues": [ { "severity": "high"|"medium"|"low", "area": "title"|"bullets"|"description"|"keywords"|"compliance", "problem": "short, quotes their text", "fix": "exact change" } ],  // 6-9 items, sorted by severity, each under 40 words
+  "quick_wins": [ "3 changes to make today, in order" ]
+}`,
+  },
+  copy: {
+    max_tokens: 1300,
+    schema: `{
   "new_title": "rewritten title, ready to paste",
   "title_alternatives": [ "alternative 1", "alternative 2" ],
-  "bullet_rewrites": [ "rewritten bullet 1", "...", "rewritten bullet 5" ],
-  "missing_keywords": [ "keyword phrases buyers likely search that are missing" ],   // 8-15 items
-  "image_checklist": [ "specific image to include for THIS product, e.g. 'Infographic showing the 3 blade sizes side by side'" ],   // 6-8 items
-  "competitor_insights": [ "what competitors do better or worse, based on the competitor titles provided" ],   // empty array if none provided
-  "quick_wins": [ "the 3 changes to make today, in order" ]
-}`;
+  "bullet_rewrites": [ "rewritten bullet 1", "...", "rewritten bullet 5" ]   // each under 45 words
+}`,
+  },
+  extras: {
+    max_tokens: 1000,
+    schema: `{
+  "missing_keywords": [ "keyword phrases buyers likely search that are missing" ],   // 8-12 items
+  "image_checklist": [ "specific image to include for THIS product" ],   // 6 items, each under 20 words
+  "competitor_insights": [ "what competitors do better or worse, based on the competitor titles provided" ]   // 2-4 items, or [] if none provided
+}`,
+  },
+};
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'Method not allowed' });
@@ -62,7 +81,9 @@ exports.handler = async (event) => {
   let input;
   try { input = JSON.parse(event.body || '{}'); } catch { return json(400, { error: 'Invalid request.' }); }
 
-  const { session_id, asin, category, title, bullets, description, competitors } = input;
+  const { session_id, part, asin, category, title, bullets, description, competitors } = input;
+  const cfg = PARTS[part];
+  if (!cfg) return json(400, { error: 'Unknown report part.' });
   if (!title || !bullets) return json(400, { error: 'Please paste at least your title and bullet points.' });
   if (String(title).length > 600 || String(bullets).length > 6000 || String(description || '').length > 6000 || String(competitors || '').length > 3000) {
     return json(400, { error: 'Input is too long. Please paste only the listing text.' });
@@ -71,7 +92,7 @@ exports.handler = async (event) => {
   const pay = await verifyPayment(session_id);
   if (!pay.ok) return json(402, { error: pay.reason });
 
-  const userMsg = `Seller's listing to audit:
+  const userMsg = `Seller's listing:
 
 ASIN: ${asin || 'not provided'}
 Category: ${category || 'not provided'}
@@ -85,11 +106,11 @@ ${bullets}
 DESCRIPTION:
 ${description || 'not provided'}
 
-COMPETITOR TITLES (top-ranking competitors, pasted by the seller):
+COMPETITOR TITLES (pasted by the seller):
 ${competitors || 'none provided'}
 
-Return the audit as JSON matching this schema:
-${SCHEMA}`;
+Return JSON matching this schema:
+${cfg.schema}`;
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -101,21 +122,21 @@ ${SCHEMA}`;
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 4000,
+        max_tokens: cfg.max_tokens,
         system: SYSTEM,
         messages: [{ role: 'user', content: userMsg }],
       }),
     });
     const data = await res.json();
     if (!res.ok) {
-      console.error('Anthropic error', data);
+      console.error('Anthropic error', JSON.stringify(data));
       return json(502, { error: 'The report could not be generated. Please try again in a minute.' });
     }
     const text = (data.content || []).map((b) => b.text || '').join('').trim();
     const start = text.indexOf('{');
     const end = text.lastIndexOf('}');
-    const report = JSON.parse(text.slice(start, end + 1));
-    return json(200, { report, email: pay.email });
+    const result = JSON.parse(text.slice(start, end + 1));
+    return json(200, { part, result, email: pay.email });
   } catch (err) {
     console.error(err);
     return json(500, { error: 'Something went wrong while building your report. Please try again.' });
