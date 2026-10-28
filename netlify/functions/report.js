@@ -132,9 +132,13 @@ ${cfg.schema}`;
       console.error('Anthropic error', JSON.stringify(data));
       return json(502, { error: 'The report could not be generated. Please try again in a minute.' });
     }
-    const text = (data.content || []).map((b) => b.text || '').join('').trim();
+    const text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text || '').join('').trim();
     const start = text.indexOf('{');
     const end = text.lastIndexOf('}');
+    if (start < 0 || end <= start) {
+      console.error('No JSON in model output', JSON.stringify({ model: data.model, stop_reason: data.stop_reason, types: (data.content || []).map((b) => b.type), usage: data.usage, text: text.slice(0, 500) }));
+      return json(502, { error: 'The report could not be generated. Please try again.' });
+    }
     const result = JSON.parse(text.slice(start, end + 1));
     return json(200, { part, result, email: pay.email });
   } catch (err) {
