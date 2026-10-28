@@ -123,6 +123,9 @@ ${cfg.schema}`;
       body: JSON.stringify({
         model: MODEL,
         max_tokens: cfg.max_tokens,
+        // Haiku 5.5 thinks adaptively by default; thinking tokens count toward max_tokens
+        // and slow the response. These are short structured outputs, so turn it off.
+        thinking: { type: 'disabled' },
         system: SYSTEM,
         messages: [{ role: 'user', content: userMsg }],
       }),
