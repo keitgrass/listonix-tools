@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Get Started | Listonix</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --lime:#c8f135; --ink:#1a1a1a; --ink2:#242424; --line:#2f2f2f; --muted:#888; --soft:#f5ffd6; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Plus Jakarta Sans', system-ui, sans-serif; background:#fff; color:var(--ink); }
+  .nav { background:#eaff4f; padding:18px max(16px, env(safe-area-inset-left, 0px)); }
+  .nav a { font-weight:700; font-size:20px; color:var(--ink); text-decoration:none; letter-spacing:-0.02em; }
+  .wrap { max-width:760px; margin:0 auto; padding:48px 16px 80px; }
+  .eyebrow { font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:#6b7a2a; margin:0 0 10px; font-weight:600; }
+  h1 { font-size:clamp(30px,5vw,44px); line-height:1.1; margin:0 0 12px; letter-spacing:-0.02em; text-wrap:balance; }
+  .lead { color:#555; font-size:16px; line-height:1.6; margin:0 0 28px; }
+  .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:0 0 28px; padding:0; list-style:none; }
+  .steps li { background:#f6f6f2; border-radius:12px; padding:14px; font-size:13px; line-height:1.45; color:#444; }
+  .steps b { display:block; color:var(--ink); font-size:14px; margin-bottom:2px; }
+  @media (max-width:640px){ .steps { grid-template-columns:1fr; } }
+  .card { background:var(--ink); color:#fff; border-radius:16px; padding:28px 24px; }
+  fieldset { border:0; padding:0; margin:0 0 6px; }
+  legend { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--lime); margin:0 0 14px; font-weight:600; }
+  label { display:block; font-size:13px; color:#ccc; margin:0 0 6px; font-weight:500; }
+  .hint { color:#777; font-weight:400; }
+  input, textarea, select { width:100%; padding:14px 16px; border-radius:10px; border:1px solid var(--line); background:var(--ink2); color:#fff; font:inherit; font-size:14px; margin-bottom:18px; }
+  textarea { resize:vertical; min-height:100px; }
+  input:focus, textarea:focus, select:focus { outline:2px solid var(--lime); outline-offset:1px; border-color:var(--lime); }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:600px){ .row { grid-template-columns:1fr; } }
+  .divider { border:0; border-top:1px solid var(--line); margin:10px 0 24px; }
+  .path { display:block; font-size:12px; color:#8a8a8a; margin:-12px 0 18px; line-height:1.5; }
+  .btn { display:block; width:100%; background:var(--lime); color:var(--ink); border:0; border-radius:10px; padding:16px; font:inherit; font-weight:600; font-size:15px; cursor:pointer; }
+  .btn:disabled { opacity:.6; cursor:wait; }
+  .err { color:#ff8a7a; font-size:14px; margin:12px 0 0; }
+  .done { background:var(--soft); border:1px solid var(--lime); border-radius:16px; padding:28px 24px; }
+  .done h2 { margin:0 0 8px; font-size:24px; }
+  .done p { margin:0 0 8px; line-height:1.6; color:#333; }
+  .small { font-size:13px; color:#666; margin-top:20px; line-height:1.6; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<div class="nav"><a href="https://listonix.webflow.io">LISTONIX.</a></div>
+
+<main class="wrap">
+  <section id="intro">
+    <p class="eyebrow" id="eyebrow">Payment received · thank you</p>
+    <h1 id="h1">Let's get your listing fixed</h1>
+    <p class="lead" id="lead">Fill in the form below. It takes about 5 minutes, and it's everything we need to start.</p>
+    <ol class="steps">
+      <li><b>1. Send your details</b>The form below, about 5 minutes.</li>
+      <li><b>2. We get to work</b><span id="step2">AI analysis, then a seller with 6 years on Amazon does the rewrite.</span></li>
+      <li><b>3. Delivered by email</b><span id="step3">Within 48 hours, ready to paste.</span></li>
+    </ol>
+  </section>
+
+  <form id="f" class="card" novalidate>
+    <fieldset>
+      <legend>About you</legend>
+      <div class="row">
+        <div><label for="name">Your name *</label><input id="name" name="name" required autocomplete="name"></div>
+        <div><label for="email">Email for delivery *</label><input id="email" name="email" type="email" required autocomplete="email"></div>
+      </div>
+      <label for="brand">Brand name *</label><input id="brand" name="brand" required>
+    </fieldset>
+
+    <hr class="divider">
+
+    <!-- Listing packages -->
+    <fieldset data-for="rewrite aplus holiday">
+      <legend>Your listing</legend>
+      <div class="row">
+        <div><label for="asin">ASIN *</label><input id="asin" name="asin" data-req placeholder="B0XXXXXXXX"></div>
+        <div><label for="market">Marketplace</label><select id="market" name="marketplace"><option>Amazon.com (US)</option><option>Amazon.ca</option><option>Amazon.co.uk</option><option>Amazon.de</option><option>Other</option></select></div>
+      </div>
+      <label for="title">Current title *</label><textarea id="title" name="current_title" data-req style="min-height:70px"></textarea>
+      <label for="bullets">Current bullet points *</label><textarea id="bullets" name="current_bullets" data-req style="min-height:140px"></textarea>
+      <label for="facts">Product facts * <span class="hint">(materials, dimensions, weight, what's in the box, compatibility, warranty)</span></label>
+      <textarea id="facts" name="product_facts" data-req placeholder="We only write what's true, so the more facts, the better the copy."></textarea>
+      <div data-for="rewrite aplus">
+        <label for="kw">Main keywords you want to rank for <span class="hint">(optional)</span></label><input id="kw" name="target_keywords">
+        <label for="comp">Top 3 competitor ASINs <span class="hint">(optional)</span></label><input id="comp" name="competitor_asins">
+      </div>
+      <div data-for="holiday">
+        <label for="gift">Who buys this as a gift? <span class="hint">(e.g. dads who DIY, new homeowners)</span></label><input id="gift" name="gift_angle">
+      </div>
+    </fieldset>
+
+    <fieldset data-for="aplus">
+      <legend>A+ content and images</legend>
+      <label for="story">What makes your brand different? *</label><textarea id="story" name="brand_story" data-req></textarea>
+      <div class="row">
+        <div><label for="hasaplus">Do you have A+ content now?</label><select id="hasaplus" name="has_aplus"><option>No</option><option>Yes, basic</option><option>Yes, Premium A+</option></select></div>
+        <div><label for="designer">Who will build the images?</label><select id="designer" name="designer"><option>Our own designer</option><option>Freelancer</option><option>Not sure yet</option></select></div>
+      </div>
+    </fieldset>
+
+    <!-- PPC -->
+    <fieldset data-for="ppc-audit managed">
+      <legend>Your ads</legend>
+      <label for="ppcasins">ASINs you advertise *</label><input id="ppcasins" name="ppc_asins" data-req placeholder="B0XXXXXXXX, B0YYYYYYYY">
+      <div class="row">
+        <div><label for="spend">Monthly ad spend (USD) *</label><input id="spend" name="monthly_ad_spend" data-req inputmode="decimal" placeholder="e.g. 1500"></div>
+        <div><label for="margin">Price and profit margin before ads *</label><input id="margin" name="price_margin" data-req placeholder="e.g. $29.99, 35%"></div>
+      </div>
+      <label for="goal">Main goal</label><select id="goal" name="goal"><option>Grow profit</option><option>Launch and rank a product</option><option>Scale sales</option><option>Clear inventory</option></select>
+    </fieldset>
+
+    <fieldset data-for="ppc-audit">
+      <label for="str">Link to your search term report, last 60 days *</label>
+      <input id="str" name="search_term_report_link" data-req placeholder="Google Drive, Dropbox or WeTransfer link">
+      <span class="path">Amazon Ads → Reports → Create report → Sponsored Products → Search term → Download. Then upload it to Drive or Dropbox and paste a link that anyone can open.</span>
+      <label for="bulk">Link to your bulk file <span class="hint">(optional, makes the audit sharper)</span></label>
+      <input id="bulk" name="bulk_file_link">
+      <span class="path">Campaign Manager → Bulk operations → Create spreadsheet → Download.</span>
+    </fieldset>
+
+    <fieldset data-for="managed">
+      <label for="acos">Current ACoS, if you know it</label><input id="acos" name="current_acos" placeholder="e.g. 38%">
+    </fieldset>
+
+    <label for="notes">Anything else we should know? <span class="hint">(optional)</span></label>
+    <textarea id="notes" name="notes" style="min-height:80px"></textarea>
+
+    <button class="btn" id="go" type="submit">Send my details →</button>
+    <p class="err" id="err" hidden></p>
+  </form>
+
+  <section id="done" class="done" hidden>
+    <h2>Got it. We're on it.</h2>
+    <p id="doneText">You'll get your delivery by email.</p>
+    <p>Questions in the meantime? Just reply to your order confirmation email.</p>
+  </section>
+
+  <p class="small">Your details are used only to deliver this order. Ad and listing data you share stays private and is never shown to anyone else.</p>
+</main>
+
+<script>
+  // Formspree endpoint (same as the contact form on the main site)
+  const FORM_ENDPOINT = 'https://formspree.io/f/xlgovwnv';
+
+  const PKGS = {
+    'rewrite':   { name:'Listing rewrite', price:'$149', hours:48, h1:"Let's rewrite your listing", step2:'AI analysis of your listing and competitors, then a seller with 6 years on Amazon writes your new copy.', step3:'Title, bullets, description and backend keywords within 48 hours.' },
+    'aplus':     { name:'Rewrite + A+ copy', price:'$249', hours:72, h1:"Let's build your product page copy", step2:'We write your listing and A+ copy, plus a brief for every gallery image.', step3:'Everything ready for you and your designer within 72 hours.' },
+    'holiday':   { name:'Holiday Quick Fix', price:'$79', hours:24, h1:"Let's get you gift-ready", step2:'We add a gift angle to your title and bullets without losing your ranking keywords.', step3:'Ready to paste within 24 hours.' },
+    'ppc-audit': { name:'PPC audit', price:'$99', hours:48, h1:"Let's find your wasted ad spend", step2:'We analyze every search term, bid and campaign in your report.', step3:'Report and ready-to-upload fixes within 48 hours.' },
+    'managed':   { name:'Managed PPC', price:'$399/month', hours:24, h1:"Let's talk about your ads", step2:'We review your account and confirm the plan with you before anything changes.', step3:'You hear back within 24 hours with next steps.' }
+  };
+
+  const params = new URLSearchParams(location.search);
+  let pkg = params.get('pkg') || 'rewrite';
+  if (!PKGS[pkg]) pkg = 'rewrite';
+  const P = PKGS[pkg];
+  const paid = params.has('session_id');
+  const $ = (id) => document.getElementById(id);
+
+  $('eyebrow').textContent = (paid ? 'Payment received · ' : '') + P.name + ' · ' + P.price;
+  $('h1').textContent = P.h1;
+  $('step2').textContent = P.step2;
+  $('step3').textContent = P.step3;
+  if (pkg === 'managed') {
+    $('lead').textContent = "Tell us about your account. We'll review it and reply within 24 hours with a plan and your subscription link.";
+  }
+
+  // Show only the fieldsets for this package; required only when visible
+  document.querySelectorAll('[data-for]').forEach((el) => {
+    const on = el.dataset.for.split(' ').includes(pkg);
+    el.hidden = !on;
+  });
+  const visible = (el) => !el.closest('[hidden]');
+
+  function eta(hours) {
+    const d = new Date(Date.now() + hours * 3600 * 1000);
+    return d.toLocaleString('en-US', { weekday:'long', month:'long', day:'numeric' });
+  }
+
+  $('f').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const err = $('err');
+    err.hidden = true;
+    const required = [...document.querySelectorAll('#name, #email, #brand, [data-req]')].filter(visible);
+    const missing = required.filter((el) => !el.value.trim());
+    if (missing.length) {
+      err.textContent = 'Please fill in the fields marked with *.';
+      err.hidden = false;
+      missing[0].focus();
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test($('email').value.trim())) {
+      err.textContent = 'Please check your email address.';
+      err.hidden = false; $('email').focus(); return;
+    }
+    const data = {};
+    [...$('f').elements].forEach((el) => { if (el.name && visible(el) && el.value.trim()) data[el.name] = el.value.trim(); });
+    data.package = P.name + ' (' + P.price + ')';
+    data.stripe_session = params.get('session_id') || 'not paid via link';
+    data._subject = 'New order: ' + P.name + ' · ' + (data.brand || '');
+    data._replyto = data.email;
+
+    const btn = $('go'); btn.disabled = true; btn.textContent = 'Sending…';
+    try {
+      const res = await fetch(FORM_ENDPOINT, { method:'POST', headers:{ 'Content-Type':'application/json', 'Accept':'application/json' }, body: JSON.stringify(data) });
+      if (!res.ok) throw new Error('send failed');
+      $('f').hidden = true;
+      $('intro').hidden = true;
+      $('doneText').textContent = pkg === 'managed'
+        ? 'We’ll review your account and email you within 24 hours with a plan and next steps.'
+        : 'Your ' + P.name.toLowerCase() + ' will arrive at ' + data.email + ' by ' + eta(P.hours) + '.';
+      $('done').hidden = false;
+      window.scrollTo({ top:0, behavior:'smooth' });
+    } catch (x) {
+      btn.disabled = false; btn.textContent = 'Send my details →';
+      err.textContent = 'That didn’t go through. Check your connection and try again, or email us your details.';
+      err.hidden = false;
+    }
+  });
+</script>
+</body>
+</html>
