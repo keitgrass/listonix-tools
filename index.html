@@ -631,6 +631,10 @@
 
 <script>
 (function(){
+  // Old payment links land on /?session_id=… : send them to the report page
+  var q = new URLSearchParams(location.search);
+  if (q.get('session_id') || q.get('code')) { location.replace('/report/' + location.search); return; }
+
   // Mobile menu
   var nav = document.querySelector('.nav'), burger = document.querySelector('.burger');
   burger.addEventListener('click', function(){

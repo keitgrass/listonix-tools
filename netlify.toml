@@ -14,10 +14,12 @@
   from = "/"
   to = "/report/?session_id=:sid"
   status = 301
+  force = true
   query = {session_id = ":sid"}
 
 [[redirects]]
   from = "/"
   to = "/report/?code=:code"
   status = 301
+  force = true
   query = {code = ":code"}
