@@ -115,6 +115,50 @@
   @media (max-width:767px){.lxm{padding:14px 0}.lxm-row span{font-size:14px;padding:0 16px}}
   @media (prefers-reduced-motion:reduce){.lxm-track{animation:none}}
 
+  /* Before / After */
+  .ba{padding:88px 24px;background:#fff}
+  .ba-in{max-width:1160px;margin:0 auto}
+  .ba-head{text-align:center;max-width:680px;margin:0 auto 40px}
+  .ba-eyebrow{font-size:12px;letter-spacing:.1em;color:#5f6d1c;text-transform:uppercase;margin:0 0 12px;font-weight:600}
+  .ba-title{font-family:"Plus Jakarta Sans",sans-serif;font-size:40px;font-weight:700;line-height:1.15;margin:0 0 12px;color:#1a1a1a;text-wrap:balance}
+  .ba-sub{font-size:16px;color:#555;line-height:1.6;margin:0}
+  .ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch}
+  .ba-card{border-radius:20px;padding:28px 26px;display:flex;flex-direction:column}
+  .ba-before{background:#f6f6f3;border:1px solid #e7e7e1}
+  .ba-after{background:#1a1a1a;color:#fff;border:2px solid #c8f135;box-shadow:0 22px 44px rgba(26,26,26,.16)}
+  .ba-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}
+  .ba-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 11px;border-radius:20px}
+  .ba-before .ba-label{background:#ffe3df;color:#b3261e}
+  .ba-after .ba-label{background:#c8f135;color:#1a1a1a}
+  .ba-score{font-family:"Plus Jakarta Sans",sans-serif;font-weight:800;font-size:30px;letter-spacing:-.02em;line-height:1}
+  .ba-score small{font-size:13px;font-weight:500;opacity:.55}
+  .ba-before .ba-score{color:#b3261e}.ba-after .ba-score{color:#c8f135}
+  .ba-k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 6px;font-weight:600}
+  .ba-before .ba-k{color:#888}.ba-after .ba-k{color:#8a8a8a}
+  .ba-t{font-size:15.5px;font-weight:600;line-height:1.45;margin:0 0 18px}
+  .ba-before .ba-t{color:#1a1a1a}
+  .ba-ul{list-style:none;margin:0;padding:0}
+  .ba-ul li{font-size:14px;line-height:1.5;margin:0 0 10px;padding-left:18px;position:relative}
+  .ba-ul li:before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%}
+  .ba-before .ba-ul li{color:#444}.ba-before .ba-ul li:before{background:#c9c9c2}
+  .ba-after .ba-ul li{color:#ddd}.ba-after .ba-ul li:before{background:#c8f135}
+  .ba-ul b{color:inherit}
+  .ba-after .ba-ul b{color:#fff}
+  .ba-flag{background:#fff3b0;color:#1a1a1a;border-radius:3px;padding:0 3px}
+  .ba-ph{background:rgba(200,241,53,.18);color:#e8ffa0;border-radius:3px;padding:0 3px}
+  .ba-notes{margin-top:auto;padding-top:16px;border-top:1px solid;display:grid;gap:8px}
+  .ba-before .ba-notes{border-color:#e7e7e1}.ba-after .ba-notes{border-color:#2c2c2c}
+  .ba-note{display:flex;gap:9px;font-size:13px;line-height:1.45;align-items:flex-start}
+  .ba-note i{font-style:normal;flex-shrink:0;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:1px}
+  .ba-before .ba-note{color:#666}.ba-before .ba-note i{background:#ffe3df;color:#b3261e}
+  .ba-after .ba-note{color:#bbb}.ba-after .ba-note i{background:#c8f135;color:#1a1a1a}
+  .ba-foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:22px}
+  .ba-disc{font-size:12.5px;color:#888;margin:0}
+  .ba-cta{display:flex;gap:10px;flex-wrap:wrap}
+  .ba-cta a{text-decoration:none;font-weight:600;font-size:14px;padding:12px 18px;border-radius:10px}
+  .ba-cta .p{background:#1a1a1a;color:#c8f135}.ba-cta .s{border:1px solid #1a1a1a;color:#1a1a1a}
+  @media (max-width:860px){.ba-grid{grid-template-columns:1fr}.ba{padding:56px 16px}.ba-title{font-size:28px}}
+
   /* How it works */
   .hiw-wrap { padding: 80px 40px; background: #f5ffd6; text-align: center; }
   .hiw-label { font-size: 12px; letter-spacing: 0.1em; color: #5f6d1c; text-transform: uppercase; margin: 0 0 12px; font-weight: 600; }
@@ -337,6 +381,58 @@
     <div class="lxm-row"><span>Weak titles</span><i></i><span>Missing keywords</span><i></i><span>Contradicting specs</span><i></i><span>All-caps bullets</span><i></i><span>Thin A+ content</span><i></i><span>Wasted ad spend</span><i></i><span>Search terms that never convert</span><i></i><span>Overlapping campaigns</span><i></i></div>
   </div>
 </div>
+
+<section class="ba" id="example">
+  <div class="ba-in">
+    <div class="ba-head">
+      <p class="ba-eyebrow">Before → After</p>
+      <h2 class="ba-title">What a fixed listing looks like</h2>
+      <p class="ba-sub">Same product, same facts. Just written the way buyers search and Amazon ranks.</p>
+    </div>
+    <div class="ba-grid">
+      <div class="ba-card ba-before">
+        <div class="ba-top"><span class="ba-label">Before</span><span class="ba-score">48<small>/100</small></span></div>
+        <p class="ba-k">Title</p>
+        <p class="ba-t">ARM JACK LIFTER 440LBS BEST LABOR SAVING TOOL!! For Door Cabinet Drywall</p>
+        <p class="ba-k">Bullets</p>
+        <ul class="ba-ul">
+          <li>HIGH QUALITY: made from best materials, outlast plastic alternatives</li>
+          <li>EASY TO USE: just step on the pedal and lift</li>
+          <li><span class="ba-flag">ALL-STEEL BUILD</span> for heavy doors and cabinets</li>
+          <li>2 PACK, perfect gift for dad</li>
+          <li><span class="ba-flag">Lightweight aluminum body</span>, easy to carry</li>
+        </ul>
+        <div class="ba-notes">
+          <div class="ba-note"><i>!</i>All caps, "BEST" and "!!" break Amazon's title rules</div>
+          <div class="ba-note"><i>!</i>Steel or aluminum? The bullets contradict each other</div>
+          <div class="ba-note"><i>!</i>Buyers search "drywall lift" and "cabinet jack". Neither is in the title</div>
+        </div>
+      </div>
+      <div class="ba-card ba-after">
+        <div class="ba-top"><span class="ba-label">After</span><span class="ba-score">89<small>/100</small></span></div>
+        <p class="ba-k">Title</p>
+        <p class="ba-t">Cabinet Jack and Drywall Panel Lifter, 440 lb Capacity, Foot-Operated Arm Lift for Doors, Cabinets and Drywall, 2 Pack</p>
+        <p class="ba-k">Bullets</p>
+        <ul class="ba-ul">
+          <li><b>Hang cabinets and doors alone</b>: step on the pedal to lift and hold up to 440 lb while you fix it in place</li>
+          <li><b>Hands-free lifting</b>: just step on the pedal to raise the load, so both hands stay free to line up hinges and screws</li>
+          <li><b>Built from <span class="ba-ph">[confirm material: steel or aluminum]</span></b>, rated <span class="ba-ph">[440 lb per lifter or per pair?]</span> for heavy doors and cabinets</li>
+          <li><b>Two lifters in the box</b>: use one under each end of a door, cabinet or drywall sheet for an even lift</li>
+          <li><b>Fits most jobs</b>: lifting range <span class="ba-ph">[min–max height in inches]</span>, works on <span class="ba-ph">[floor types]</span></li>
+        </ul>
+        <div class="ba-notes">
+          <div class="ba-note"><i>✓</i>Top search terms moved to the front of the title</div>
+          <div class="ba-note"><i>✓</i>Every bullet leads with the benefit, then backs it with a spec</div>
+          <div class="ba-note"><i>✓</i>No invented facts: missing specs are marked for the seller to fill in</div>
+        </div>
+      </div>
+    </div>
+    <div class="ba-foot">
+      <p class="ba-disc">Example listing created to show our process. Not a real brand or client. Scores are illustrative.</p>
+      <div class="ba-cta"><a class="p" href="/score/">Score my listing free →</a><a class="s" href="#pricing">See pricing</a></div>
+    </div>
+  </div>
+</section>
 
 <section class="hiw-wrap" id="How-it-works">
   <p class="hiw-label">How it works</p>
