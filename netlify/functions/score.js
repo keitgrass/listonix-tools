@@ -5,7 +5,7 @@ const MODEL = 'claude-haiku-5-5';
 
 const json = (statusCode, body) => ({
   statusCode,
-  headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': 'https://www.amazon.com' }, // TEMP: outreach scoring, remove after
+  headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify(body),
 });
 
