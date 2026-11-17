@@ -1,0 +1,23 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+
+# Old report URLs (Stripe success links point to /?session_id=...) now live at /report/
+[[redirects]]
+  from = "/"
+  to = "/report/?session_id=:sid"
+  status = 301
+  query = {session_id = ":sid"}
+
+[[redirects]]
+  from = "/"
+  to = "/report/?code=:code"
+  status = 301
+  query = {code = ":code"}
