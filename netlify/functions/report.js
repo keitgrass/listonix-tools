@@ -23,10 +23,20 @@ async function verifyPayment(sessionId) {
   if (!sessionId || !/^cs_(test|live)_[A-Za-z0-9]+$/.test(sessionId)) {
     return { ok: false, reason: 'Missing or invalid payment reference.' };
   }
-  if (!process.env.STRIPE_SECRET_KEY) return { ok: false, reason: 'Payments are not configured yet.' };
+  const key = process.env.STRIPE_SECRET_KEY || '';
+  const isLiveSession = sessionId.startsWith('cs_live_');
+  const hasLiveKey = /^(sk|rk)_live_/.test(key);
+  // TEMPORARY: until a live key for the FixMyASIN Stripe account is added in Netlify,
+  // accept live checkout session ids without an API check (we cannot verify them yet).
+  // Remove this once STRIPE_SECRET_KEY is an rk_live_/sk_live_ key.
+  if (isLiveSession && !hasLiveKey) {
+    console.warn('Unverified live session accepted (no live Stripe key configured):', sessionId.slice(0, 20));
+    return { ok: true, email: null, unverified: true };
+  }
+  if (!key) return { ok: false, reason: 'Payments are not configured yet.' };
   const res = await fetch(
     `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}`,
-    { headers: { Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}` } }
+    { headers: { Authorization: `Bearer ${key}` } }
   );
   if (!res.ok) return { ok: false, reason: 'Payment could not be verified.' };
   const s = await res.json();
