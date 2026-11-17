@@ -6,7 +6,7 @@
 //   ANTHROPIC_API_KEY   – Anthropic API key
 //   STRIPE_SECRET_KEY   – Stripe secret or restricted key (read access to Checkout Sessions)
 //   TEST_CODE           – optional private code that bypasses payment, for your own testing
-//   REPORT_MIN_CENTS    – optional minimum paid amount in cents (default 1999)
+//   REPORT_PAYMENT_LINK_ID – optional Stripe payment link id of the $19.99 report
 
 const MODEL = 'claude-haiku-5-5';
 
@@ -30,9 +30,13 @@ async function verifyPayment(sessionId) {
   );
   if (!res.ok) return { ok: false, reason: 'Payment could not be verified.' };
   const s = await res.json();
-  const min = parseInt(process.env.REPORT_MIN_CENTS || '1999', 10);
-  if (s.payment_status !== 'paid') return { ok: false, reason: 'Payment not completed.' };
-  if ((s.amount_total || 0) < min) return { ok: false, reason: 'Payment amount does not match this product.' };
+  // The checkout must come from the report's payment link. We don't compare amounts:
+  // customers may pay in local currency (Adaptive Pricing) or use a promotion code.
+  const linkId = process.env.REPORT_PAYMENT_LINK_ID || 'plink_1UcjVlPQY2KLLXdw6Su25heL';
+  if (s.status !== 'complete' || !['paid', 'no_payment_required'].includes(s.payment_status)) {
+    return { ok: false, reason: 'Payment not completed.' };
+  }
+  if (s.payment_link !== linkId) return { ok: false, reason: 'This payment is for a different product.' };
   return { ok: true, email: s.customer_details?.email || null };
 }
 
