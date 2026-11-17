@@ -16,7 +16,8 @@ Rules:
 - Score fairly: most real listings land between 35 and 80. Reserve 85+ for genuinely strong copy.
 - Pick the 3 problems that cost the most sales or rank. Quote the seller's own words in each problem.
 - Each fix must be a concrete change they can make today, not generic advice.
-- Respect Amazon rules: flag promotional claims ("best", "#1"), ALL CAPS words, special characters like ! $ ?, titles over 200 characters, and contradictions between bullets.
+- Respect Amazon rules: flag promotional claims ("best", "#1"), ALL CAPS words, special characters like ! $ ?, titles over 75 characters (Amazon's cap since July 27, 2026, all categories except media; longer titles get rewritten by Amazon's AI), and contradictions between bullets.
+- Never advise making a title longer than 75 characters. Extra keywords and use cases belong in the Item Highlights field (max 125 characters).
 - NEVER invent product facts. If a fix needs a spec they did not give, write a placeholder in square brackets, e.g. [material].
 - Clear American English, no fluff.
 - Respond with compact JSON only, no markdown fences, matching this schema exactly:

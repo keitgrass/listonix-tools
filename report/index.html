@@ -222,6 +222,7 @@
 
       <h2>Your new title</h2>
       ${copyBox(r.new_title)}
+      ${r.item_highlights ? `<p class="eyebrow" style="margin-top:14px">Item Highlights (max 125 characters, shown under the title)</p>${copyBox(r.item_highlights)}` : ''}
       <p class="eyebrow" style="margin-top:14px">Alternatives</p>
       ${(r.title_alternatives || []).map(copyBox).join('')}
 

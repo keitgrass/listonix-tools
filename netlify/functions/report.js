@@ -55,7 +55,9 @@ const SYSTEM = `You are a senior Amazon listing strategist with 6+ years of hand
 Rules:
 - Analyze ONLY the text the seller provided. Never claim to have seen the live listing, its images, reviews, sales or rankings.
 - Be specific: quote the seller's own words when pointing out a problem, and give a concrete rewrite or action for every issue.
-- Respect Amazon rules: no promotional claims ("best", "#1", "guaranteed"), no prices, no competitor brand names, title within 200 characters, no ALL CAPS words, no special characters like !, $, ?, ~.
+- Respect Amazon rules: no promotional claims ("best", "#1", "guaranteed"), no prices, no competitor brand names, no ALL CAPS words, no special characters like !, $, ?, ~.
+- Title length: since July 27, 2026 Amazon caps titles at 75 characters including spaces (all categories except media) and rewrites longer titles with AI. Every title you write MUST be 75 characters or fewer, counted exactly. A title over 75 characters is a high-severity issue. Do NOT tell a seller to make a title longer than 75 characters.
+- Item Highlights: the searchable field shown under the title, max 125 characters. Supporting keywords, use cases and materials that no longer fit the title go here.
 - Bullets: lead with the benefit, back it with a spec. Flag vague claims, duplicated info, missing key specs (size, material, compatibility, what's in the box, warranty).
 - NEVER invent product facts (materials, sizes, counts, certifications, compatibility, warranty). In rewrites, use only facts the seller gave; where a key spec is missing, insert a clear placeholder in square brackets, e.g. [blade material] or [length in inches], so the seller fills it in.
 - If the seller's own text CONTRADICTS itself on a spec (e.g. "all-steel" in one place and "aluminum" in another, or a capacity that could be per unit or per pair), do NOT pick a side anywhere, including titles. Use a placeholder such as [confirm material: steel or aluminum].
@@ -76,10 +78,11 @@ const PARTS = {
 }`,
   },
   copy: {
-    max_tokens: 1300,
+    max_tokens: 1450,
     schema: `{
-  "new_title": "rewritten title, ready to paste",
-  "title_alternatives": [ "alternative 1", "alternative 2" ],
+  "new_title": "rewritten title, ready to paste, 75 characters or fewer including spaces",
+  "item_highlights": "Item Highlights text, 125 characters or fewer, with the use cases and keywords that did not fit the title",
+  "title_alternatives": [ "alternative 1", "alternative 2" ],   // each 75 characters or fewer
   "bullet_rewrites": [ "rewritten bullet 1", "...", "rewritten bullet 5" ]   // each under 45 words
 }`,
   },
