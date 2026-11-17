@@ -88,6 +88,8 @@
       </div>
       <label for="title">Your current title *</label>
       <textarea id="title" name="title" required style="min-height:70px" placeholder="Paste your product title"></textarea>
+      <label for="highlights">Item Highlights <span class="hint">(optional, the short line under your title)</span></label>
+      <textarea id="highlights" name="highlights" style="min-height:50px" placeholder="Paste the Item Highlights line, if your listing has one"></textarea>
       <label for="bullets">Your bullet points * <span class="hint">(paste all 5)</span></label>
       <textarea id="bullets" name="bullets" required style="min-height:170px" placeholder="Paste your bullet points"></textarea>
       <button class="btn" id="go" type="submit">Get my free score →</button>
@@ -117,12 +119,12 @@
   $('f').addEventListener('submit', async function(e){
     e.preventDefault();
     var err = $('err'); err.classList.add('hidden');
-    var data = { asin:$('asin').value.trim(), email:$('email').value.trim(), title:$('title').value.trim(), bullets:$('bullets').value.trim() };
+    var data = { asin:$('asin').value.trim(), email:$('email').value.trim(), title:$('title').value.trim(), highlights:$('highlights').value.trim(), bullets:$('bullets').value.trim() };
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) { err.textContent = 'Please enter a valid email.'; err.classList.remove('hidden'); return; }
     if (data.title.length < 10 || data.bullets.length < 20) { err.textContent = 'Please paste your full title and bullet points.'; err.classList.remove('hidden'); return; }
     $('go').disabled = true; show('loading');
     try {
-      var res = await fetch('/.netlify/functions/score', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ asin:data.asin, title:data.title, bullets:data.bullets }) });
+      var res = await fetch('/.netlify/functions/score', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ asin:data.asin, title:data.title, highlights:data.highlights, bullets:data.bullets }) });
       var body = await res.json().catch(function(){ return {}; });
       if (!res.ok || !body.result) throw new Error(body.error || 'We could not score your listing. Please try again.');
       render(body.result, data);
@@ -153,7 +155,7 @@
       '<a class="btn" href="/report/">Get the full report for $19.99 →</a>' +
       '<p class="small" style="color:#888">$19.99 is credited toward any package. Prefer it done for you? <a href="/#pricing" style="color:#c8f135">See listing rewrite from $149</a>.</p></div>' +
       '<div class="actions"><button class="btn ghost" type="button" id="again">Score another listing</button></div>';
-    $('again').addEventListener('click', function(){ $('title').value = ''; $('bullets').value = ''; $('asin').value = ''; show('formSec'); });
+    $('again').addEventListener('click', function(){ $('title').value = ''; $('highlights').value = ''; $('bullets').value = ''; $('asin').value = ''; show('formSec'); });
     show('out');
   }
 

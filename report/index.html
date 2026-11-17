@@ -107,6 +107,8 @@
       </div>
       <label>Title *</label>
       <textarea name="title" required style="min-height:70px" placeholder="Your current product title"></textarea>
+      <label>Item Highlights <span class="hint">(optional, the short line under your title)</span></label>
+      <textarea name="highlights" style="min-height:50px" placeholder="Paste the Item Highlights line, if your listing has one"></textarea>
       <label>Bullet points *</label>
       <textarea name="bullets" required style="min-height:160px" placeholder="Paste all 5 bullet points"></textarea>
       <label>Description <span class="hint">(optional)</span></label>
@@ -222,7 +224,8 @@
 
       <h2>Your new title</h2>
       ${copyBox(r.new_title)}
-      ${r.item_highlights ? `<p class="eyebrow" style="margin-top:14px">Item Highlights (max 125 characters, shown under the title)</p>${copyBox(r.item_highlights)}` : ''}
+      ${r.lengths ? `<p class="eyebrow" style="margin-top:6px">${r.lengths.new_title}/75 characters${r.lengths.title_ok ? '' : ' · over Amazon\'s limit, shorten before publishing'}</p>` : ''}
+      ${r.item_highlights ? `<p class="eyebrow" style="margin-top:14px">Item Highlights · ${r.lengths && r.lengths.item_highlights ? r.lengths.item_highlights + '/125 characters' : 'max 125 characters'}, shown under the title</p>${copyBox(r.item_highlights)}` : ''}
       <p class="eyebrow" style="margin-top:14px">Alternatives</p>
       ${(r.title_alternatives || []).map(copyBox).join('')}
 

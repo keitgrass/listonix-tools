@@ -57,7 +57,8 @@ Rules:
 - Be specific: quote the seller's own words when pointing out a problem, and give a concrete rewrite or action for every issue.
 - Respect Amazon rules: no promotional claims ("best", "#1", "guaranteed"), no prices, no competitor brand names, no ALL CAPS words, no special characters like !, $, ?, ~.
 - Title length: since July 27, 2026 Amazon caps titles at 75 characters including spaces (all categories except media) and rewrites longer titles with AI. Every title you write MUST be 75 characters or fewer, counted exactly. A title over 75 characters is a high-severity issue. Do NOT tell a seller to make a title longer than 75 characters.
-- Item Highlights: the searchable field shown under the title, max 125 characters. Supporting keywords, use cases and materials that no longer fit the title go here.
+- Item Highlights: the searchable field shown under the title, max 125 characters. Supporting keywords, use cases and materials that no longer fit the title go here. If the seller provided Item Highlights, judge and improve them; never claim the listing lacks them.
+- Numbers: only state character counts or bullet counts that appear in MEASURED FACTS. Never count yourself.
 - Bullets: lead with the benefit, back it with a spec. Flag vague claims, duplicated info, missing key specs (size, material, compatibility, what's in the box, warranty).
 - NEVER invent product facts (materials, sizes, counts, certifications, compatibility, warranty). In rewrites, use only facts the seller gave; where a key spec is missing, insert a clear placeholder in square brackets, e.g. [blade material] or [length in inches], so the seller fills it in.
 - If the seller's own text CONTRADICTS itself on a spec (e.g. "all-steel" in one place and "aluminum" in another, or a capacity that could be per unit or per pair), do NOT pick a side anywhere, including titles. Use a placeholder such as [confirm material: steel or aluminum].
@@ -96,17 +97,73 @@ const PARTS = {
   },
 };
 
+// Exact numbers computed in code. The model must use these and never count by itself.
+function listingFacts(title, highlights, bullets) {
+  const t = String(title || '').trim();
+  const h = String(highlights || '').trim();
+  const lines = String(bullets || '').split(/\n+/).map((x) => x.trim()).filter(Boolean);
+  return `MEASURED FACTS (computed by code and exact. Use these numbers. Never count characters or bullets yourself):
+- Title length: ${t.length} characters (Amazon limit: 75)${t.length > 75 ? '. OVER THE LIMIT' : '. Within the limit, so never advise adding words to the title'}
+- Item Highlights: ${h ? `${h.length} characters (limit: 125)` : 'not provided by the seller. Do not claim the listing has none; you may suggest text for it'}
+- Bullet points pasted: ${lines.length} (one per line as pasted)`;
+}
+
+const LIMITS = { title: 75, highlights: 125 };
+
+async function callModel(cfg, messages) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: cfg.max_tokens,
+      // Haiku 5.5 thinks adaptively by default; thinking tokens count toward max_tokens
+      // and slow the response. These are short structured outputs, so turn it off.
+      thinking: { type: 'disabled' },
+      system: SYSTEM,
+      messages,
+    }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    console.error('Anthropic error', JSON.stringify(data));
+    return { error: 'The report could not be generated. Please try again in a minute.', status: 502 };
+  }
+  const text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text || '').join('').trim();
+  const start = text.indexOf('{');
+  const end = text.lastIndexOf('}');
+  if (start < 0 || end <= start) {
+    console.error('No JSON in model output', JSON.stringify({ model: data.model, stop_reason: data.stop_reason, usage: data.usage, text: text.slice(0, 500) }));
+    return { error: 'The report could not be generated. Please try again.', status: 502 };
+  }
+  return { result: JSON.parse(text.slice(start, end + 1)), raw: text.slice(start, end + 1) };
+}
+
+// Returns a list of length problems in the rewritten copy, measured in code.
+function copyLengthProblems(r) {
+  const out = [];
+  const len = (x) => String(x || '').trim().length;
+  if (len(r.new_title) > LIMITS.title) out.push(`new_title is ${len(r.new_title)} characters (max ${LIMITS.title})`);
+  (r.title_alternatives || []).forEach((a, i) => { if (len(a) > LIMITS.title) out.push(`title_alternatives[${i}] is ${len(a)} characters (max ${LIMITS.title})`); });
+  if (len(r.item_highlights) > LIMITS.highlights) out.push(`item_highlights is ${len(r.item_highlights)} characters (max ${LIMITS.highlights})`);
+  return out;
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') return json(405, { error: 'Method not allowed' });
 
   let input;
   try { input = JSON.parse(event.body || '{}'); } catch { return json(400, { error: 'Invalid request.' }); }
 
-  const { session_id, part, asin, category, title, bullets, description, competitors } = input;
+  const { session_id, part, asin, category, title, highlights, bullets, description, competitors } = input;
   const cfg = PARTS[part];
   if (!cfg) return json(400, { error: 'Unknown report part.' });
   if (!title || !bullets) return json(400, { error: 'Please paste at least your title and bullet points.' });
-  if (String(title).length > 600 || String(bullets).length > 6000 || String(description || '').length > 6000 || String(competitors || '').length > 3000) {
+  if (String(title).length > 600 || String(highlights || '').length > 600 || String(bullets).length > 6000 || String(description || '').length > 6000 || String(competitors || '').length > 3000) {
     return json(400, { error: 'Input is too long. Please paste only the listing text.' });
   }
 
@@ -121,6 +178,9 @@ Category: ${category || 'not provided'}
 TITLE:
 ${title}
 
+ITEM HIGHLIGHTS (the line under the title):
+${highlights || 'not provided'}
+
 BULLET POINTS:
 ${bullets}
 
@@ -130,42 +190,41 @@ ${description || 'not provided'}
 COMPETITOR TITLES (pasted by the seller):
 ${competitors || 'none provided'}
 
+${listingFacts(title, highlights, bullets)}
+
 Return JSON matching this schema:
 ${cfg.schema}`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: cfg.max_tokens,
-        // Haiku 5.5 thinks adaptively by default; thinking tokens count toward max_tokens
-        // and slow the response. These are short structured outputs, so turn it off.
-        thinking: { type: 'disabled' },
-        system: SYSTEM,
-        messages: [{ role: 'user', content: userMsg }],
-      }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      console.error('Anthropic error', JSON.stringify(data));
-      return json(502, { error: 'The report could not be generated. Please try again in a minute.' });
+    const messages = [{ role: 'user', content: userMsg }];
+    let out = await callModel(cfg, messages);
+    if (out.error) return json(out.status, { error: out.error });
+    let result = out.result;
+
+    if (part === 'copy') {
+      // Check the rewritten copy against Amazon's limits and ask for one fix if needed.
+      const problems = copyLengthProblems(result);
+      if (problems.length) {
+        const retry = await callModel(cfg, [
+          ...messages,
+          { role: 'assistant', content: out.raw },
+          { role: 'user', content: `Measured by code: ${problems.join('; ')}. Shorten only those fields to fit the limits, keep everything else the same, and return the full JSON again.` },
+        ]);
+        if (!retry.error) result = retry.result;
+      }
+      const len = (x) => String(x || '').trim().length;
+      // Never hand out copy that breaks the limits.
+      result.title_alternatives = (result.title_alternatives || []).filter((a) => len(a) <= LIMITS.title);
+      if (len(result.item_highlights) > LIMITS.highlights) delete result.item_highlights;
+      result.lengths = {
+        new_title: len(result.new_title),
+        item_highlights: result.item_highlights ? len(result.item_highlights) : null,
+        title_ok: len(result.new_title) <= LIMITS.title,
+      };
     }
-    const text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text || '').join('').trim();
-    const start = text.indexOf('{');
-    const end = text.lastIndexOf('}');
-    if (start < 0 || end <= start) {
-      console.error('No JSON in model output', JSON.stringify({ model: data.model, stop_reason: data.stop_reason, types: (data.content || []).map((b) => b.type), usage: data.usage, text: text.slice(0, 500) }));
-      return json(502, { error: 'The report could not be generated. Please try again.' });
-    }
-    const result = JSON.parse(text.slice(start, end + 1));
+
     if (Array.isArray(result.missing_keywords)) {
-      const existing = `${title} ${bullets} ${description || ''}`.toLowerCase();
+      const existing = `${title} ${highlights || ''} ${bullets} ${description || ''}`.toLowerCase();
       result.missing_keywords = result.missing_keywords.filter((k) => !existing.includes(String(k).toLowerCase().trim()));
     }
     return json(200, { part, result, email: pay.email });

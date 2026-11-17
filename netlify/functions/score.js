@@ -18,6 +18,7 @@ Rules:
 - Each fix must be a concrete change they can make today, not generic advice.
 - Respect Amazon rules: flag promotional claims ("best", "#1"), ALL CAPS words, special characters like ! $ ?, titles over 75 characters (Amazon's cap since July 27, 2026, all categories except media; longer titles get rewritten by Amazon's AI), and contradictions between bullets.
 - Never advise making a title longer than 75 characters. Extra keywords and use cases belong in the Item Highlights field (max 125 characters).
+- Only state character or bullet counts that appear in MEASURED FACTS. If Item Highlights were provided, judge them too; never claim a listing lacks them.
 - NEVER invent product facts. If a fix needs a spec they did not give, write a placeholder in square brackets, e.g. [material].
 - Clear American English, no fluff.
 - Respond with compact JSON only, no markdown fences, matching this schema exactly:
@@ -28,22 +29,33 @@ exports.handler = async (event) => {
 
   let input;
   try { input = JSON.parse(event.body || '{}'); } catch { return json(400, { error: 'Invalid request.' }); }
-  const { asin, title, bullets } = input;
+  const { asin, title, highlights, bullets } = input;
 
   if (!title || !bullets || String(title).trim().length < 10 || String(bullets).trim().length < 20) {
     return json(400, { error: 'Please paste your full title and bullet points.' });
   }
-  if (String(title).length > 600 || String(bullets).length > 4000) {
+  if (String(title).length > 600 || String(highlights || '').length > 600 || String(bullets).length > 4000) {
     return json(400, { error: 'That looks too long. Please paste only the title and the 5 bullets.' });
   }
 
+  const t = String(title).trim();
+  const h = String(highlights || '').trim();
+  const bulletLines = String(bullets).split(/\n+/).map((x) => x.trim()).filter(Boolean);
   const userMsg = `ASIN: ${asin || 'not provided'}
 
 TITLE:
 ${title}
 
+ITEM HIGHLIGHTS (the line under the title):
+${h || 'not provided'}
+
 BULLET POINTS:
-${bullets}`;
+${bullets}
+
+MEASURED FACTS (computed by code and exact. Use these numbers. Never count characters or bullets yourself):
+- Title length: ${t.length} characters (Amazon limit: 75)${t.length > 75 ? '. OVER THE LIMIT' : '. Within the limit, so never advise adding words to the title'}
+- Item Highlights: ${h ? `${h.length} characters (limit: 125)` : 'not provided by the seller. Do not claim the listing has none'}
+- Bullet points pasted: ${bulletLines.length} (one per line as pasted)`;
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
