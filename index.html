@@ -237,6 +237,27 @@
   @media (max-width: 760px) { .px-section { padding: 56px 16px; } .px-title, .ppc-title { font-size: 28px; } .ppc-wrap { margin-top: 48px; padding: 40px 16px; border-radius: 20px; } .tagline, .tagline-dark { min-height: 0; } .badge-spacer { display: none; } }
   @media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none; } }
 
+  /* Visual design upsell */
+  .vis { margin-top:24px; display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .vis-card { border-radius:18px; padding:26px 24px; display:flex; flex-direction:column; gap:10px; background:#f6f6f3; border:1px solid #e7e7e1; }
+  .vis-card.dark { background:#1a1a1a; border-color:#2a2a2a; color:#fff; }
+  .vis-k { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:#777; margin:0; }
+  .vis-card.dark .vis-k { color:#999; }
+  .vis-h { font-family:"Plus Jakarta Sans",sans-serif; font-size:24px; font-weight:700; margin:0; letter-spacing:-.01em; }
+  .vis-h small { font-size:15px; font-weight:500; color:#777; margin-left:4px; }
+  .vis-card.dark .vis-h small { color:#999; }
+  .vis-p { font-size:14px; line-height:1.55; margin:0; color:#555; }
+  .vis-card.dark .vis-p { color:#bbb; }
+  .vis-list { display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 6px; padding:0; list-style:none; }
+  .vis-list li { font-size:12.5px; padding:5px 10px; border-radius:20px; background:#fff; border:1px solid #e2e2dc; color:#333; }
+  .vis-card.dark .vis-list li { background:#242424; border-color:#333; color:#ddd; }
+  .vis-btn { margin-top:auto; align-self:flex-start; text-decoration:none; font-weight:600; font-size:14px; padding:12px 18px; border-radius:10px; background:#1a1a1a; color:#c8f135; }
+  .vis-card.dark .vis-btn { background:#c8f135; color:#1a1a1a; }
+  .vis-head { grid-column:1/-1; display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:16px; }
+  .vis-head h3 { font-family:"Plus Jakarta Sans",sans-serif; font-size:22px; margin:0; }
+  .vis-head p { margin:0; font-size:14px; color:#666; }
+  @media (max-width:760px){ .vis { grid-template-columns:1fr; } }
+
   /* About */
   .about-wrap { padding: 88px 40px; background: #ffffff; }
   .about-inner { max-width: 960px; margin: 0 auto; }
@@ -521,7 +542,25 @@
       <div class="feature"><span class="check">✓</span><span class="feature-text">Image brief: what each gallery image should show and say</span></div>
       <div class="feature"><span class="check">✓</span><span class="feature-text">Competitor listing analysis</span></div>
       <div class="feature"><span class="check">✓</span><span class="feature-text">Delivered in 72 hours · 2 revisions</span></div>
-      <p class="note">Copy and image brief only. Image and A+ graphic design not included; ask us for a quote.</p>
+      <p class="note">Copy and image brief only. Image and A+ graphic design not included; <a href="#visuals" style="color:#c8f135">see visuals</a>.</p>
+    </div>
+  </div>
+
+  <div class="vis" id="visuals">
+    <div class="vis-head"><h3>Need the visuals too?</h3><p>Designed for your product, quoted individually. No obligation.</p></div>
+    <div class="vis-card">
+      <p class="vis-k">Listing images</p>
+      <p class="vis-h">from $499</p>
+      <p class="vis-p">A full gallery that sells on mobile: a clean main image plus infographics and lifestyle shots that answer buyers' questions before they ask.</p>
+      <ul class="vis-list"><li>Main image (white background)</li><li>Infographics</li><li>Lifestyle scenes</li><li>Size and comparison charts</li></ul>
+      <a class="vis-btn" href="/quote/?type=images">Get a quote →</a>
+    </div>
+    <div class="vis-card dark">
+      <p class="vis-k">A+ Content, Brand Story, Storefront</p>
+      <p class="vis-h">Custom quote</p>
+      <p class="vis-p">Every brand is different, so we plan each one with you. Tell us your ASIN and your vision, and you get a fixed-price proposal within 24 hours.</p>
+      <ul class="vis-list"><li>A+ and Premium A+</li><li>Brand Story</li><li>Amazon Storefront</li><li>Full visual package</li></ul>
+      <a class="vis-btn" href="/quote/?type=aplus">Describe your project →</a>
     </div>
   </div>
 
@@ -693,7 +732,8 @@
           <option value="rewrite-aplus">Rewrite + A+ copy — $249</option>
           <option value="ppc-audit">PPC audit — $99</option>
           <option value="managed-ppc">Managed PPC — from $399/month</option>
-          <option value="images">Image design — quote</option>
+          <option value="images">Listing images — from $499</option>
+          <option value="aplus-design">A+ / Brand Story design — quote</option>
           <option value="not-sure">Not sure yet</option>
         </select>
       </div>
