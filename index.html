@@ -285,7 +285,6 @@
   </div>
 </header>
 
-<div class="hbar" id="holidayBar">🎁 Holiday Quick Fix: $79, delivered in 24h. Gift-ready title &amp; bullets before Black Friday.<a href="#get-in-touch" data-pkg="holiday-quick-fix">Claim it →</a></div>
 
 <main>
 <section class="hero">
@@ -594,7 +593,6 @@
       <div class="form-full">
         <select name="package" id="pkgSelect" aria-label="Which service are you interested in?">
           <option value="" disabled selected>Which service are you interested in?</option>
-          <option value="holiday-quick-fix" id="holidayOpt">Holiday Quick Fix — $79</option>
           <option value="rewrite">Listing rewrite — $149</option>
           <option value="rewrite-aplus">Rewrite + A+ copy — $249</option>
           <option value="ppc-audit">PPC audit — $99</option>
@@ -647,13 +645,6 @@
     burger.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
   document.querySelectorAll('.nav-links a').forEach(function(a){ a.addEventListener('click', function(){ nav.classList.remove('open'); burger.setAttribute('aria-expanded','false'); }); });
-
-  // Holiday offer ends after Nov 20, 2026 (Tallinn time)
-  var holidayEnd = new Date('2026-11-21T00:00:00+02:00');
-  if (new Date() >= holidayEnd) {
-    var bar = document.getElementById('holidayBar'); if (bar) bar.remove();
-    var opt = document.getElementById('holidayOpt'); if (opt) opt.remove();
-  }
 
   // Package buttons preselect the service in the contact form
   var sel = document.getElementById('pkgSelect');
