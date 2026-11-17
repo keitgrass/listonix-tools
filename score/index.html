@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Free Amazon Listing Score | FixMyASIN</title>
+<meta name="description" content="Paste your Amazon title and bullets. Get a free score out of 100 and the 3 biggest problems holding your listing back, in about 15 seconds.">
+<link rel="canonical" href="https://fixmyasin.com/score/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --lime:#c8f135; --ink:#1a1a1a; --ink2:#242424; --line:#2a2a2a; --muted:#888; --soft:#f5ffd6; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Instrument Sans", system-ui, sans-serif; background:#fff; color:var(--ink); }
+  h1, h2, .score-num { font-family:"Plus Jakarta Sans", sans-serif; }
+  .nav { background:#e5fe00; }
+  .nav-in { max-width:1240px; margin:0 auto; padding:16px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  .logo { display:inline-flex; align-items:center; gap:3px; font-family:"Plus Jakarta Sans", sans-serif; font-weight:800; font-size:22px; color:#1a1a1a; text-decoration:none; letter-spacing:-0.03em; line-height:1; }
+  .logo b { font-weight:800; background:#1a1a1a; color:var(--lime); border-radius:7px; padding:4px 7px 5px; letter-spacing:0; transform:rotate(-3deg); display:inline-block; margin-left:2px; }
+  .nav-link { color:#1a1a1a; text-decoration:none; font-size:15px; opacity:.8; }
+  .nav-link:hover { opacity:1; }
+  .wrap { max-width:760px; margin:0 auto; padding:48px 16px 80px; }
+  .eyebrow { font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:#5f6d1c; margin:0 0 10px; font-weight:600; }
+  h1 { font-size:clamp(30px,5vw,44px); line-height:1.1; margin:0 0 12px; letter-spacing:-0.02em; }
+  .lead { color:#555; font-size:16px; line-height:1.6; margin:0 0 28px; }
+  .card { background:var(--ink); color:#fff; border-radius:16px; padding:28px 24px; }
+  label { display:block; font-size:13px; color:#bbb; margin:0 0 6px; font-weight:500; }
+  .hint { color:#666; font-weight:400; }
+  input, textarea { width:100%; padding:14px 16px; border-radius:10px; border:1px solid var(--line); background:var(--ink2); color:#fff; font:inherit; font-size:14px; margin-bottom:18px; }
+  textarea { resize:vertical; min-height:110px; }
+  input:focus, textarea:focus { outline:none; border-color:var(--lime); }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:600px){ .row { grid-template-columns:1fr; } }
+  .btn { display:block; width:100%; background:var(--lime); color:var(--ink); border:0; border-radius:10px; padding:16px; font:inherit; font-weight:600; font-size:15px; cursor:pointer; text-align:center; text-decoration:none; }
+  .btn:disabled { opacity:.6; cursor:wait; }
+  .btn.ghost { background:transparent; border:1px solid var(--ink); color:var(--ink); }
+  .small { font-size:12.5px; color:#777; margin:12px 0 0; line-height:1.5; }
+  .card .small { color:#888; }
+  .err { color:#ff8a7a; font-size:14px; margin:12px 0 0; }
+  .hidden { display:none; }
+  .loading { text-align:center; padding:56px 0; color:#555; }
+  .spinner { width:36px; height:36px; border:3px solid #eee; border-top-color:var(--ink); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 16px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation:none; } }
+  .score-head { display:flex; gap:24px; align-items:center; background:var(--ink); color:#fff; border-radius:16px; padding:24px; margin-bottom:16px; }
+  .score-num { font-size:60px; font-weight:800; color:var(--lime); line-height:1; letter-spacing:-0.03em; }
+  .score-num small { font-size:18px; color:#777; font-weight:500; }
+  .verdict { font-size:15px; line-height:1.5; color:#eee; margin:0; }
+  .subs { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:28px; }
+  .sub { background:#f5f5f5; border-radius:12px; padding:14px 16px; }
+  .sub b { display:block; font-size:22px; font-family:"Plus Jakarta Sans", sans-serif; }
+  .sub span { font-size:12px; color:var(--muted); }
+  @media (max-width:600px){ .score-head { flex-direction:column; align-items:flex-start; } }
+  h2 { font-size:22px; margin:8px 0 14px; letter-spacing:-0.01em; }
+  .issue { border:1px solid #eee; border-radius:12px; padding:16px 18px; margin-bottom:10px; }
+  .issue .n { display:inline-flex; width:24px; height:24px; border-radius:50%; background:var(--lime); align-items:center; justify-content:center; font-weight:700; font-size:13px; margin-right:8px; }
+  .issue p { margin:8px 0 0; font-size:14px; line-height:1.55; }
+  .issue .fix { color:#2d5b00; }
+  mark { background:#fff3b0; color:inherit; padding:0 2px; border-radius:3px; }
+  .upsell { background:var(--ink); color:#fff; border-radius:16px; padding:28px 24px; margin-top:28px; }
+  .upsell h3 { margin:0 0 8px; font-size:20px; font-family:"Plus Jakarta Sans", sans-serif; }
+  .upsell p { color:#aaa; margin:0 0 18px; font-size:14px; line-height:1.6; }
+  .upsell ul { color:#ddd; font-size:14px; line-height:1.7; margin:0 0 20px; padding-left:20px; }
+  .actions { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; } .actions .btn { flex:1; min-width:200px; }
+  .foot { text-align:center; font-size:12.5px; color:#999; padding:0 16px 32px; }
+  .foot a { color:#666; }
+</style>
+</head>
+<body>
+<header class="nav"><div class="nav-in">
+  <a class="logo" href="/" aria-label="FixMyASIN home">FixMy<b>ASIN</b></a>
+  <a class="nav-link" href="/#pricing">Pricing</a>
+</div></header>
+
+<main class="wrap">
+  <section id="formSec">
+    <p class="eyebrow">Free listing score</p>
+    <h1>How good is your Amazon listing, really?</h1>
+    <p class="lead">Paste your title and bullets. In about 15 seconds you get a score out of 100 and the 3 problems costing you the most sales, with a fix for each.</p>
+    <form id="f" class="card" novalidate>
+      <div class="row">
+        <div><label for="asin">ASIN <span class="hint">(optional)</span></label><input id="asin" name="asin" placeholder="B0XXXXXXXX" autocomplete="off"></div>
+        <div><label for="email">Your email *</label><input id="email" name="email" type="email" placeholder="you@brand.com" autocomplete="email" required></div>
+      </div>
+      <label for="title">Your current title *</label>
+      <textarea id="title" name="title" required style="min-height:70px" placeholder="Paste your product title"></textarea>
+      <label for="bullets">Your bullet points * <span class="hint">(paste all 5)</span></label>
+      <textarea id="bullets" name="bullets" required style="min-height:170px" placeholder="Paste your bullet points"></textarea>
+      <button class="btn" id="go" type="submit">Get my free score →</button>
+      <p class="err hidden" id="err" role="alert"></p>
+      <p class="small">Free, no credit card. We may follow up with a listing tip or two. Unsubscribe anytime.</p>
+    </form>
+  </section>
+
+  <section id="loading" class="hidden loading" aria-live="polite">
+    <div class="spinner"></div>
+    <p>Scoring your listing… about 15 seconds.</p>
+  </section>
+
+  <section id="out" class="hidden" aria-live="polite"></section>
+</main>
+
+<p class="foot">© <span id="yr">2026</span> FixMyASIN · <a href="mailto:hello@fixmyasin.com">hello@fixmyasin.com</a> · Not affiliated with or endorsed by Amazon.</p>
+
+<script>
+(function(){
+  var FORM_ENDPOINT = 'https://formspree.io/f/xlgovwnv';
+  var $ = function(id){ return document.getElementById(id); };
+  var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
+  var ph = function(s){ return esc(s).replace(/\[([^\]]{1,60})\]/g, '<mark>[$1]</mark>'); };
+  function show(id){ ['formSec','loading','out'].forEach(function(s){ $(s).classList.toggle('hidden', s !== id); }); window.scrollTo({ top:0, behavior:'smooth' }); }
+
+  $('f').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var err = $('err'); err.classList.add('hidden');
+    var data = { asin:$('asin').value.trim(), email:$('email').value.trim(), title:$('title').value.trim(), bullets:$('bullets').value.trim() };
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) { err.textContent = 'Please enter a valid email.'; err.classList.remove('hidden'); return; }
+    if (data.title.length < 10 || data.bullets.length < 20) { err.textContent = 'Please paste your full title and bullet points.'; err.classList.remove('hidden'); return; }
+    $('go').disabled = true; show('loading');
+    try {
+      var res = await fetch('/.netlify/functions/score', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ asin:data.asin, title:data.title, bullets:data.bullets }) });
+      var body = await res.json().catch(function(){ return {}; });
+      if (!res.ok || !body.result) throw new Error(body.error || 'We could not score your listing. Please try again.');
+      render(body.result, data);
+      // Save the lead (does not block the result)
+      fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body: JSON.stringify({
+        _subject: 'Free score lead: ' + (data.asin || data.title.slice(0, 50)) + ' (' + body.result.score + '/100)',
+        email: data.email, asin: data.asin, score: body.result.score, verdict: body.result.verdict, title: data.title, bullets: data.bullets, source: 'fixmyasin.com/score'
+      }) }).catch(function(){});
+    } catch (ex) {
+      show('formSec'); err.textContent = ex.message; err.classList.remove('hidden');
+    } finally { $('go').disabled = false; }
+  });
+
+  function render(r, data){
+    var probs = (r.problems || []).map(function(p, i){
+      return '<div class="issue"><span class="n">' + (i + 1) + '</span><b>' + ph(p.problem) + '</b><p class="fix"><b>Fix:</b> ' + ph(p.fix) + '</p></div>';
+    }).join('');
+    var s = r.scores || {};
+    $('out').innerHTML =
+      '<p class="eyebrow">Your free listing score</p>' +
+      '<div class="score-head"><div class="score-num">' + esc(r.score) + '<small>/100</small></div><p class="verdict">' + ph(r.verdict) + '</p></div>' +
+      '<div class="subs"><div class="sub"><b>' + esc(s.title != null ? s.title : '–') + '</b><span>Title</span></div><div class="sub"><b>' + esc(s.bullets != null ? s.bullets : '–') + '</b><span>Bullets</span></div></div>' +
+      '<h2>The 3 biggest problems</h2>' + probs +
+      '<p class="small">Highlighted <mark>[brackets]</mark> are details only you know. Fill them in before you publish.</p>' +
+      '<div class="upsell"><h3>Want every issue fixed, not just 3?</h3>' +
+      '<p>The Full Listing Report finds every problem, rewrites your title and all 5 bullets ready to paste, adds missing keywords and checks you against your top competitors. Instant.</p>' +
+      '<ul><li>All issues ranked by impact</li><li>Rewritten title + 5 bullets</li><li>Missing keywords and competitor check</li></ul>' +
+      '<a class="btn" href="/report/">Get the full report for $19.99 →</a>' +
+      '<p class="small" style="color:#888">$19.99 is credited toward any package. Prefer it done for you? <a href="/#pricing" style="color:#c8f135">See listing rewrite from $149</a>.</p></div>' +
+      '<div class="actions"><button class="btn ghost" type="button" id="again">Score another listing</button></div>';
+    $('again').addEventListener('click', function(){ $('title').value = ''; $('bullets').value = ''; $('asin').value = ''; show('formSec'); });
+    show('out');
+  }
+
+  $('yr').textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
