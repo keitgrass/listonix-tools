@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /start/
+Disallow: /report/?
+
+Sitemap: https://fixmyasin.com/sitemap.xml
