@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Amazon 75-Character Title Checker | FixMyASIN</title>
+<meta name="description" content="Amazon now caps titles at 75 characters and its AI rewrites longer ones. See what your title lost and get a free 75-character title and Item Highlights.">
+<link rel="canonical" href="https://fixmyasin.com/title-checker/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --lime:#c8f135; --ink:#1a1a1a; --ink2:#242424; --line:#2a2a2a; --muted:#888; --soft:#f5ffd6; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Instrument Sans", system-ui, sans-serif; background:#fff; color:var(--ink); }
+  h1, h2, .score-num { font-family:"Plus Jakarta Sans", sans-serif; }
+  .nav { background:#e5fe00; }
+  .nav-in { max-width:1240px; margin:0 auto; padding:16px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  .logo { display:inline-flex; align-items:center; gap:3px; font-family:"Plus Jakarta Sans", sans-serif; font-weight:800; font-size:22px; color:#1a1a1a; text-decoration:none; letter-spacing:-0.03em; line-height:1; }
+  .logo b { font-weight:800; background:#1a1a1a; color:var(--lime); border-radius:7px; padding:4px 7px 5px; letter-spacing:0; transform:rotate(-3deg); display:inline-block; margin-left:2px; }
+  .nav-link { color:#1a1a1a; text-decoration:none; font-size:15px; opacity:.8; }
+  .nav-link:hover { opacity:1; }
+  .wrap { max-width:760px; margin:0 auto; padding:48px 16px 80px; }
+  .eyebrow { font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:#5f6d1c; margin:0 0 10px; font-weight:600; }
+  h1 { font-size:clamp(30px,5vw,44px); line-height:1.1; margin:0 0 12px; letter-spacing:-0.02em; }
+  .lead { color:#555; font-size:16px; line-height:1.6; margin:0 0 28px; }
+  .card { background:var(--ink); color:#fff; border-radius:16px; padding:28px 24px; }
+  label { display:block; font-size:13px; color:#bbb; margin:0 0 6px; font-weight:500; }
+  .hint { color:#666; font-weight:400; }
+  input, textarea { width:100%; padding:14px 16px; border-radius:10px; border:1px solid var(--line); background:var(--ink2); color:#fff; font:inherit; font-size:14px; margin-bottom:18px; }
+  textarea { resize:vertical; min-height:110px; }
+  input:focus, textarea:focus { outline:none; border-color:var(--lime); }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:600px){ .row { grid-template-columns:1fr; } }
+  .btn { display:block; width:100%; background:var(--lime); color:var(--ink); border:0; border-radius:10px; padding:16px; font:inherit; font-weight:600; font-size:15px; cursor:pointer; text-align:center; text-decoration:none; }
+  .btn:disabled { opacity:.6; cursor:wait; }
+  .btn.ghost { background:transparent; border:1px solid var(--ink); color:var(--ink); }
+  .small { font-size:12.5px; color:#777; margin:12px 0 0; line-height:1.5; }
+  .card .small { color:#888; }
+  .err { color:#ff8a7a; font-size:14px; margin:12px 0 0; }
+  .hidden { display:none; }
+  .loading { text-align:center; padding:56px 0; color:#555; }
+  .spinner { width:36px; height:36px; border:3px solid #eee; border-top-color:var(--ink); border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 16px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation:none; } }
+  .score-head { display:flex; gap:24px; align-items:center; background:var(--ink); color:#fff; border-radius:16px; padding:24px; margin-bottom:16px; }
+  .score-num { font-size:60px; font-weight:800; color:var(--lime); line-height:1; letter-spacing:-0.03em; }
+  .score-num small { font-size:18px; color:#777; font-weight:500; }
+  .verdict { font-size:15px; line-height:1.5; color:#eee; margin:0; }
+  .subs { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:28px; }
+  .sub { background:#f5f5f5; border-radius:12px; padding:14px 16px; }
+  .sub b { display:block; font-size:22px; font-family:"Plus Jakarta Sans", sans-serif; }
+  .sub span { font-size:12px; color:var(--muted); }
+  @media (max-width:600px){ .score-head { flex-direction:column; align-items:flex-start; } }
+  h2 { font-size:22px; margin:8px 0 14px; letter-spacing:-0.01em; }
+  .issue { border:1px solid #eee; border-radius:12px; padding:16px 18px; margin-bottom:10px; }
+  .issue .n { display:inline-flex; width:24px; height:24px; border-radius:50%; background:var(--lime); align-items:center; justify-content:center; font-weight:700; font-size:13px; margin-right:8px; }
+  .issue p { margin:8px 0 0; font-size:14px; line-height:1.55; }
+  .issue .fix { color:#2d5b00; }
+  mark { background:#fff3b0; color:inherit; padding:0 2px; border-radius:3px; }
+  .upsell { background:var(--ink); color:#fff; border-radius:16px; padding:28px 24px; margin-top:28px; }
+  .upsell h3 { margin:0 0 8px; font-size:20px; font-family:"Plus Jakarta Sans", sans-serif; }
+  .upsell p { color:#aaa; margin:0 0 18px; font-size:14px; line-height:1.6; }
+  .upsell ul { color:#ddd; font-size:14px; line-height:1.7; margin:0 0 20px; padding-left:20px; }
+  .actions { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; } .actions .btn { flex:1; min-width:200px; }
+  .foot { text-align:center; font-size:12.5px; color:#999; padding:0 16px 32px; }
+  .foot a { color:#666; }
+
+  .meter { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:24px; }
+  @media (max-width:600px){ .meter { grid-template-columns:1fr; } }
+  .meter .sub b.bad { color:#c0392b; } .meter .sub b.ok { color:#2d5b00; }
+  .chips { display:flex; flex-wrap:wrap; gap:6px; margin:0 0 22px; }
+  .chip { background:#fff0ee; color:#a3291b; border-radius:999px; padding:5px 11px; font-size:13px; font-weight:600; }
+  .chip.ok { background:#eef9d6; color:#2d5b00; } .chip.mid { background:#fff7d6; color:#7a5a00; }
+  .copybox { background:var(--soft); border:1px solid #dff3a0; border-radius:12px; padding:16px 18px; margin:0 0 6px; font-size:16px; line-height:1.5; font-weight:600; }
+  .copyrow { display:flex; justify-content:space-between; align-items:center; gap:10px; margin:0 0 20px; font-size:13px; color:#555; }
+  .copyrow button { background:none; border:1px solid #ccc; border-radius:8px; padding:6px 12px; font:inherit; font-size:13px; cursor:pointer; }
+  .rule { background:#f7f7f2; border-radius:12px; padding:14px 16px; font-size:14px; line-height:1.55; color:#444; margin:0 0 24px; }
+</style>
+</head>
+<body>
+<header class="nav"><div class="nav-in">
+  <a class="logo" href="/" aria-label="FixMyASIN home">FixMy<b>ASIN</b></a>
+  <a class="nav-link" href="/#pricing">Pricing</a>
+</div></header>
+
+<main class="wrap">
+  <section id="formSec">
+    <p class="eyebrow">Free title checker</p>
+    <h1>Did Amazon's 75-character rewrite cut your best keywords?</h1>
+    <p class="lead">Since July 27, Amazon caps titles at 75 characters and its AI shortens longer ones. Paste your title and we'll show you what was lost, then write a 75-character title and Item Highlights that put it back.</p>
+    <form id="f" class="card" novalidate>
+      <div class="row">
+        <div><label for="brand">Brand <span class="hint">(optional)</span></label><input id="brand" name="brand" placeholder="Your brand name" autocomplete="off"></div>
+        <div><label for="email">Your email *</label><input id="email" name="email" type="email" placeholder="you@brand.com" autocomplete="email" required></div>
+      </div>
+      <label for="current">Title Amazon shows now *</label>
+      <textarea id="current" name="current" required style="min-height:64px" placeholder="Copy it from your product page"></textarea>
+      <label for="old">Your original title <span class="hint">(optional, from Seller Central or your files, so we can see what was cut)</span></label>
+      <textarea id="old" name="old" style="min-height:64px" placeholder="The longer title you had before"></textarea>
+      <label for="hl">Item Highlights <span class="hint">(optional, the short line under your title)</span></label>
+      <textarea id="hl" name="hl" style="min-height:50px" placeholder="Leave empty if your listing has none"></textarea>
+      <label for="kw">Keywords you want to rank for <span class="hint">(optional, comma separated)</span></label>
+      <input id="kw" name="kw" placeholder="e.g. ladder stabilizer, gutter guard, roof standoff">
+      <button class="btn" id="go" type="submit">Check my title →</button>
+      <p class="err hidden" id="err" role="alert"></p>
+      <p class="small">Free, no credit card. We may follow up with a listing tip or two. Unsubscribe anytime.</p>
+    </form>
+  </section>
+
+  <section id="loading" class="hidden loading" aria-live="polite">
+    <div class="spinner"></div>
+    <p>Checking your title…</p>
+  </section>
+
+  <section id="out" class="hidden" aria-live="polite"></section>
+</main>
+
+<p class="foot">© <span id="yr">2026</span> FixMyASIN · <a href="/terms/">Terms</a> · <a href="/privacy/">Privacy</a> · <a href="mailto:hello@fixmyasin.com">hello@fixmyasin.com</a> · Not affiliated with or endorsed by Amazon.</p>
+
+<script>
+(function(){
+  var FORM_ENDPOINT = 'https://formspree.io/f/xlgovwnv';
+  var $ = function(id){ return document.getElementById(id); };
+  var esc = function(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
+  var ph = function(s){ return esc(s).replace(/\[([^\]]{1,60})\]/g, '<mark>[$1]</mark>'); };
+  function show(id){ ['formSec','loading','out'].forEach(function(s){ $(s).classList.toggle('hidden', s !== id); }); window.scrollTo({ top:0, behavior:'smooth' }); }
+
+  $('f').addEventListener('submit', async function(e){
+    e.preventDefault();
+    var err = $('err'); err.classList.add('hidden');
+    var d = { brand:$('brand').value.trim(), email:$('email').value.trim(), current_title:$('current').value.trim(), old_title:$('old').value.trim(), highlights:$('hl').value.trim(), keywords:$('kw').value.trim() };
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)) { err.textContent = 'Please enter a valid email.'; err.classList.remove('hidden'); return; }
+    if (d.current_title.length < 10) { err.textContent = 'Please paste the title Amazon shows now.'; err.classList.remove('hidden'); return; }
+    $('go').disabled = true; show('loading');
+    try {
+      var res = await fetch('/.netlify/functions/title', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ brand:d.brand, current_title:d.current_title, old_title:d.old_title, highlights:d.highlights, keywords:d.keywords }) });
+      var body = await res.json().catch(function(){ return {}; });
+      if (!res.ok || !body.result) throw new Error(body.error || 'We could not check your title. Please try again.');
+      render(body.result);
+      fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'application/json','Accept':'application/json'}, body: JSON.stringify({
+        _subject: 'Title checker lead: ' + d.current_title.slice(0, 60), email: d.email, brand: d.brand,
+        current_title: d.current_title, old_title: d.old_title, highlights: d.highlights, keywords: d.keywords, source: 'fixmyasin.com/title-checker'
+      }) }).catch(function(){});
+    } catch (ex) {
+      show('formSec'); err.textContent = ex.message; err.classList.remove('hidden');
+    } finally { $('go').disabled = false; }
+  });
+
+  function copyBtn(text){ return '<button type="button" data-copy="' + esc(text) + '">Copy</button>'; }
+
+  function render(r){
+    var m = r.measured || {};
+    var cur = m.current_title_length, over = m.current_title_over_limit;
+    var meter =
+      '<div class="meter">' +
+        '<div class="sub"><b class="' + (over ? 'bad' : 'ok') + '">' + esc(cur) + '/75</b><span>Title now' + (over ? ', over the limit' : '') + '</span></div>' +
+        '<div class="sub"><b>' + (m.old_title_length != null ? esc(m.old_title_length) : '–') + '</b><span>Original title</span></div>' +
+        '<div class="sub"><b>' + (m.item_highlights_length != null ? esc(m.item_highlights_length) + '/125' : 'none') + '</b><span>Item Highlights now</span></div>' +
+      '</div>';
+    var dropped = (m.dropped_words || []);
+    var droppedHtml = m.old_title_length == null ? '' :
+      '<h2>Words your title lost</h2>' + (dropped.length
+        ? '<p class="small" style="margin:-6px 0 10px">In your original title, but now in neither the title nor Item Highlights.</p><div class="chips">' + dropped.map(function(w){ return '<span class="chip">' + esc(w) + '</span>'; }).join('') + '</div>'
+        : '<div class="chips"><span class="chip ok">Nothing important was dropped</span></div>');
+    var kw = (m.keyword_coverage || []);
+    var kwHtml = !kw.length ? '' : '<h2>Your keywords</h2><div class="chips">' + kw.map(function(k){
+      var cls = k.in_title ? 'ok' : (k.in_highlights ? 'mid' : ''); var lbl = k.in_title ? 'in title' : (k.in_highlights ? 'Item Highlights only' : 'missing');
+      return '<span class="chip ' + cls + '">' + esc(k.keyword) + ': ' + lbl + '</span>'; }).join('') + '</div>';
+    var lost = (r.lost || []).map(function(p, i){ return '<div class="issue"><span class="n">' + (i + 1) + '</span><b>' + ph(p.what) + '</b><p>' + ph(p.why) + '</p></div>'; }).join('');
+    var fix = '';
+    if (r.new_title) fix += '<p class="eyebrow" style="margin-top:8px">New title</p><div class="copybox">' + ph(r.new_title) + '</div><div class="copyrow"><span>' + esc(m.new_title_length) + '/75 characters</span>' + copyBtn(r.new_title) + '</div>';
+    if (r.item_highlights) fix += '<p class="eyebrow">New Item Highlights</p><div class="copybox" style="font-weight:500">' + ph(r.item_highlights) + '</div><div class="copyrow"><span>' + esc(m.new_highlights_length) + '/125 characters</span>' + copyBtn(r.item_highlights) + '</div>';
+    var notes = (r.notes || []).map(function(n){ return '<li>' + ph(n) + '</li>'; }).join('');
+    $('out').innerHTML =
+      '<p class="eyebrow">Your title check</p>' +
+      '<div class="score-head"><p class="verdict" style="font-size:17px">' + ph(r.verdict) + '</p></div>' +
+      meter + droppedHtml + kwHtml +
+      (lost ? '<h2>What it costs you</h2>' + lost : '') +
+      (fix ? '<h2 style="margin-top:22px">Your 75-character fix</h2>' + fix : '') +
+      (notes ? '<ul class="small" style="padding-left:18px">' + notes + '</ul>' : '') +
+      '<p class="small">Highlighted <mark>[brackets]</mark> are details only you know. Fill them in before you publish.</p>' +
+      '<div class="upsell"><h3>Want the rest of the listing to match?</h3>' +
+      '<p>The Full Listing Report checks your bullets and keywords too, and rewrites everything ready to paste. Or let us do it for you.</p>' +
+      '<a class="btn" href="/report/">Get the full report for $19.99 →</a>' +
+      '<p class="small" style="color:#888">$19.99 is credited toward any package. <a href="/#pricing" style="color:#c8f135">Listing rewrite from $149</a>.</p></div>' +
+      '<div class="actions"><button class="btn ghost" type="button" id="again">Check another title</button></div>';
+    $('out').querySelectorAll('[data-copy]').forEach(function(b){ b.addEventListener('click', function(){
+      var t = b.getAttribute('data-copy'); (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function(){ b.textContent = 'Copied'; }).catch(function(){ b.textContent = 'Select and copy'; });
+    }); });
+    $('again').addEventListener('click', function(){ ['current','old','hl','kw'].forEach(function(id){ $(id).value = ''; }); show('formSec'); });
+    show('out');
+  }
+
+  $('yr').textContent = new Date().getFullYear();
+})();
+</script>
+<script src="/consent.js" defer></script>
+</body>
+</html>
