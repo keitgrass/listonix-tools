@@ -52,14 +52,14 @@ Your job: explain what the seller's title lost or is missing, then write a bette
 
 Rules:
 - Use ONLY the facts and numbers in MEASURED FACTS. Never count characters or words yourself, and never claim a word was dropped unless it is in the measured dropped-words list.
-- The new title MUST be 75 characters or fewer. Lead with the brand (if given) and the core product keyword, then the most important spec (size, count, material, compatibility).
-- Item Highlights MUST be 125 characters or fewer. Put the use cases, secondary keywords and specs that did not fit the title there. Plain text, no ALL CAPS, no emoji.
+- Each new title option MUST be 75 characters or fewer; aim for 55 to 70. Keep titles short: about 9 to 11 words. Lead with the brand (if given) and the core product keyword, then the most important spec (size, count, material, compatibility).
+- Each Item Highlights option MUST be 125 characters or fewer; aim for 90 to 115. Put the use cases, secondary keywords and specs that did not fit the title there. Plain text, no ALL CAPS, no emoji.
 - Recover the most valuable dropped words and missing keywords into the title or Item Highlights. Do not stuff; keep both readable.
 - NEVER invent product facts. Use only what the seller gave. If a key spec is missing, use a placeholder in square brackets, e.g. [size].
 - No promotional claims ("best", "#1", "premium"), no ! $ ? ~ characters.
 - Clear American English.
 - Respond with compact JSON only, no markdown fences, matching this schema exactly:
-{"verdict":"one sentence on the biggest problem","lost":[{"what":"short name of what was lost or is missing","why":"why it costs sales or rank, under 25 words"}],"new_title":"75 characters or fewer","item_highlights":"125 characters or fewer","notes":["up to 2 short tips"]}
+{"verdict":"one sentence on the biggest problem","lost":[{"what":"short name of what was lost or is missing","why":"why it costs sales or rank, under 25 words"}],"new_titles":["3 different title options, each about 9 to 11 words and well under 75 characters"],"item_highlights_options":["2 options, each about 15 to 18 words and under 125 characters"],"notes":["up to 2 short tips"]}
 "lost" has 2-4 items, most costly first.`;
 
 async function callModel(messages) {
@@ -70,7 +70,7 @@ async function callModel(messages) {
       'x-api-key': process.env.ANTHROPIC_API_KEY,
       'anthropic-version': '2023-06-01',
     },
-    body: JSON.stringify({ model: MODEL, max_tokens: 800, thinking: { type: 'disabled' }, system: SYSTEM, messages }),
+    body: JSON.stringify({ model: MODEL, max_tokens: 1000, thinking: { type: 'disabled' }, system: SYSTEM, messages }),
   });
   const data = await res.json();
   if (!res.ok) { console.error('Anthropic error', JSON.stringify(data)); return { error: true }; }
@@ -135,16 +135,25 @@ MEASURED FACTS (computed by code and exact):
     let r = out.result;
 
     const len = (x) => String(x || '').trim().length;
-    const problems = [];
-    if (len(r.new_title) > LIMITS.title) problems.push(`new_title is ${len(r.new_title)} characters (max ${LIMITS.title})`);
-    if (len(r.item_highlights) > LIMITS.highlights) problems.push(`item_highlights is ${len(r.item_highlights)} characters (max ${LIMITS.highlights})`);
-    if (problems.length) {
+    // The model can't count characters reliably, so it writes several options and code picks
+    // the longest one that fits the limit.
+    const pick = (opts, max) => (Array.isArray(opts) ? opts : [opts])
+      .map((x) => String(x || '').trim()).filter((x) => x && x.length <= max)
+      .sort((a, b) => b.length - a.length)[0] || null;
+    let title = pick(r.new_titles, LIMITS.title);
+    let hl = pick(r.item_highlights_options, LIMITS.highlights);
+    if (!title || !hl) {
+      const lens = (opts) => (Array.isArray(opts) ? opts : []).map(len).join(', ');
       const retry = await callModel([...messages, { role: 'assistant', content: out.raw },
-        { role: 'user', content: `Measured by code: ${problems.join('; ')}. Shorten only those fields to fit, keep the rest, and return the full JSON again.` }]);
-      if (!retry.error) r = retry.result;
+        { role: 'user', content: `Measured by code: title option lengths are ${lens(r.new_titles) || 'none'} characters (max ${LIMITS.title}); Item Highlights option lengths are ${lens(r.item_highlights_options) || 'none'} (max ${LIMITS.highlights}). Write shorter options (titles about 8 to 10 words, Item Highlights about 14 to 16 words) and return the full JSON again.` }]);
+      if (!retry.error) {
+        title = title || pick(retry.result.new_titles, LIMITS.title);
+        hl = hl || pick(retry.result.item_highlights_options, LIMITS.highlights);
+      }
     }
-    if (len(r.new_title) > LIMITS.title) r.new_title = null;
-    if (len(r.item_highlights) > LIMITS.highlights) r.item_highlights = null;
+    r.new_title = title;
+    r.item_highlights = hl;
+    delete r.new_titles; delete r.item_highlights_options;
     if (Array.isArray(r.lost)) r.lost = r.lost.slice(0, 4);
     if (Array.isArray(r.notes)) r.notes = r.notes.slice(0, 2);
 
