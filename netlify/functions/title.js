@@ -15,7 +15,7 @@ const json = (statusCode, body) => ({
 const STOP = new Set(('a an and or the for with of to in on by at from as is are be this that your you our it its into per pcs pc pack set ' +
   'x & - | , / + new best premium quality fits fit most all great perfect ideal').split(' '));
 
-const words = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9.\/" ]+/g, ' ').split(/\s+/).filter(Boolean);
+const words = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9.\/"+ ]+/g, ' ').split(/\s+/).filter(Boolean);
 const norm = (w) => w.replace(/[".]+$/g, '').replace(/(ing|es|s|e)$/, '');
 
 // Words that were in the old title but appear in neither the current title nor the Item Highlights.
